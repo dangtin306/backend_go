@@ -1,0 +1,256 @@
+[
+  {
+    "type": "variation",
+    "variation_id": 15087,
+    "attributes": {
+      "attribute_pa_loai": "turnitin-student",
+      "attribute_pa_so-luong-file": "3-file"
+    },
+    "price": 80000,
+    "regular_price": 80000,
+    "sku": "",
+    "is_in_stock": true,
+    "is_purchasable": true,
+    "image": {
+      "src": "https://premium69.com/wp-content/uploads/2025/11/turnitin.png",
+      "thumb": "https://premium69.com/wp-content/uploads/2025/11/turnitin-222x222.png",
+      "alt": "Dịch vụ check đạo văn Turnitin chính xác cho sinh viên và giảng viên"
+    }
+  },
+  {
+    "type": "variation",
+    "variation_id": 15088,
+    "attributes": {
+      "attribute_pa_loai": "turnitin-student",
+      "attribute_pa_so-luong-file": "1-file"
+    },
+    "price": 30000,
+    "regular_price": 30000,
+    "sku": "tur-3-st",
+    "is_in_stock": true,
+    "is_purchasable": true,
+    "image": {
+      "src": "https://premium69.com/wp-content/uploads/2025/11/turnitin.png",
+      "thumb": "https://premium69.com/wp-content/uploads/2025/11/turnitin-222x222.png",
+      "alt": "Dịch vụ check đạo văn Turnitin chính xác cho sinh viên và giảng viên"
+    }
+  },
+  {
+    "type": "variation",
+    "variation_id": 15023,
+    "attributes": {
+      "attribute_pa_loai": "turnitin-instructor",
+      "attribute_pa_so-luong-file": "3-file"
+    },
+    "price": 100000,
+    "regular_price": 100000,
+    "sku": "tur-3-in",
+    "is_in_stock": true,
+    "is_purchasable": true,
+    "image": {
+      "src": "https://premium69.com/wp-content/uploads/2025/11/turnitin.png",
+      "thumb": "https://premium69.com/wp-content/uploads/2025/11/turnitin-222x222.png",
+      "alt": "Dịch vụ check đạo văn Turnitin chính xác cho sinh viên và giảng viên"
+    }
+  },
+  {
+    "type": "variation",
+    "variation_id": 15022,
+    "attributes": {
+      "attribute_pa_loai": "turnitin-instructor",
+      "attribute_pa_so-luong-file": "1-file"
+    },
+    "price": 50000,
+    "regular_price": 50000,
+    "sku": "tur-1-in",
+    "is_in_stock": true,
+    "is_purchasable": true,
+    "image": {
+      "src": "https://premium69.com/wp-content/uploads/2025/11/turnitin.png",
+      "thumb": "https://premium69.com/wp-content/uploads/2025/11/turnitin-222x222.png",
+      "alt": "Dịch vụ check đạo văn Turnitin chính xác cho sinh viên và giảng viên"
+    }
+  },
+  {
+    "type": "variation",
+    "variation_id": 15256,
+    "attributes": {
+      "attribute_pa_loai": "khong-gioi-han-credit",
+      "attribute_pa_han-su-dung": "1-thang"
+    },
+    "price": 700000,
+    "regular_price": 6315552,
+    "sku": "gamma-kgh-1",
+    "is_in_stock": true,
+    "is_purchasable": true,
+    "image": {
+      "src": "https://premium69.com/wp-content/uploads/2025/11/gamma-AI.png",
+      "thumb": "https://premium69.com/wp-content/uploads/2025/11/gamma-AI-222x222.png",
+      "alt": "Gamma AI – Công cụ AI tạo bài thuyết trình và slide tự động"
+    }
+  },
+  {
+    "type": "variation",
+    "variation_id": 15257,
+    "attributes": {
+      "attribute_pa_loai": "plus",
+      "attribute_pa_han-su-dung": "1-thang"
+    },
+    "price": 120000,
+    "regular_price": 203200,
+    "sku": "gamma-plus-1",
+    "is_in_stock": true,
+    "is_purchasable": true,
+    "image": {
+      "src": "https://premium69.com/wp-content/uploads/2025/11/gamma-AI.png",
+      "thumb": "https://premium69.com/wp-content/uploads/2025/11/gamma-AI-222x222.png",
+      "alt": "Gamma AI – Công cụ AI tạo bài thuyết trình và slide tự động"
+    }
+  },
+  {
+    "type": "variation",
+    "variation_id": 15258,
+    "attributes": {
+      "attribute_pa_loai": "pro",
+      "attribute_pa_han-su-dung": "1-thang"
+    },
+    "price": 160000,
+    "regular_price": 430000,
+    "sku": "gamma-pro-1",
+    "is_in_stock": true,
+    "is_purchasable": true,
+    "image": {
+      "src": "https://premium69.com/wp-content/uploads/2025/11/gamma-AI.png",
+      "thumb": "https://premium69.com/wp-content/uploads/2025/11/gamma-AI-222x222.png",
+      "alt": "Gamma AI – Công cụ AI tạo bài thuyết trình và slide tự động"
+    }
+  },
+  {
+    "type": "variation",
+    "variation_id": 15259,
+    "attributes": {
+      "attribute_pa_loai": "ultra",
+      "attribute_pa_han-su-dung": "1-thang"
+    },
+    "price": 400000,
+    "regular_price": 2368328,
+    "sku": "gamma-ultra-1",
+    "is_in_stock": true,
+    "is_purchasable": true,
+    "image": {
+      "src": "https://premium69.com/wp-content/uploads/2025/11/gamma-AI.png",
+      "thumb": "https://premium69.com/wp-content/uploads/2025/11/gamma-AI-222x222.png",
+      "alt": "Gamma AI – Công cụ AI tạo bài thuyết trình và slide tự động"
+    }
+  },
+  {
+    "type": "simple",
+    "title": "Key Bản Quyền CCleaner Professional 1 PC (12 Tháng) – Kích Hoạt Online, Dọn Rác, Tăng Tốc Máy Tính, Diệt Virus, Cập Nhật Tự Động",
+    "url": "https://premium69.com/san-pham/key-ban-quyen-ccleaner-professional-1-pc-kich-hoat-online-don-rac-tang-toc-may-tinh-diet-virus-cap-nhat-tu-dong/",
+    "image": "https://premium69.com/wp-content/uploads/2025/07/6.png",
+    "description": "Thời bạn bản quyền 1 năm\r\n\r\nKích hoạt cho 1 máy tính\r\n\r\nHổ trợ: hệ điều hành Windows",
+    "price": 250000,
+    "regular_price": 1045531,
+    "currency": "VND",
+    "brand": "CCleaner"
+  },
+  {
+    "type": "simple",
+    "title": "Key Microsoft Office 2016 bản quyền vĩnh viễn",
+    "url": "https://premium69.com/san-pham/key-microsoft-office-2016-ban-quyen-vinh-vien/",
+    "image": "https://premium69.com/wp-content/uploads/2025/03/9.png",
+    "description": "Hướng dẫn kích hoạt: Xem ngay\r\nBảo hành 7 ngày",
+    "price": 200000,
+    "regular_price": 200000,
+    "currency": "VND",
+    "brand": "Microsoft"
+  },
+  {
+    "type": "simple",
+    "title": "Key Microsoft Office 2019 bản quyền vĩnh viễn",
+    "url": "https://premium69.com/san-pham/key-microsoft-office-2019-ban-quyen-vinh-vien/",
+    "image": "https://premium69.com/wp-content/uploads/2025/03/10.png",
+    "description": "Hướng dẫn kích hoạt: Xem ngay\r\nBảo hành 7 ngày",
+    "price": 210000,
+    "regular_price": 210000,
+    "currency": "VND",
+    "brand": "Microsoft"
+  },
+  {
+    "type": "simple",
+    "title": "Key Microsoft Office 2021 bản quyền vĩnh viễn",
+    "url": "https://premium69.com/san-pham/key-microsoft-office-2021-ban-quyen-vinh-vien/",
+    "image": "https://premium69.com/wp-content/uploads/2025/03/11.png",
+    "description": "Hướng dẫn kích hoạt: Xem ngay\r\nBảo hành 7 ngày",
+    "price": 220000,
+    "regular_price": 220000,
+    "currency": "VND",
+    "brand": "Microsoft"
+  },
+  {
+    "type": "simple",
+    "title": "Key Microsoft Project 2016 Bản Quyền Vĩnh Viễn – Quản Lý Dự Án Chuyên Nghiệp",
+    "url": "https://premium69.com/san-pham/key-microsoft-project-2016-ban-quyen-vinh-vien/",
+    "image": "https://premium69.com/wp-content/uploads/2025/03/15.png",
+    "description": "Hướng dẫn kích hoạt: Xem ngay\r\nBảo hành 7 ngày",
+    "price": 200000,
+    "regular_price": 200000,
+    "currency": "VND",
+    "brand": "Microsoft"
+  },
+  {
+    "type": "simple",
+    "title": "Key Microsoft Project 2019 Bản Quyền Vĩnh Viễn – Quản Lý Dự Án Chuyên Nghiệp",
+    "url": "https://premium69.com/san-pham/key-microsoft-project-2019-ban-quyen-vinh-vien/",
+    "image": "https://premium69.com/wp-content/uploads/2025/03/16.png",
+    "description": "Hướng dẫn kích hoạt: Xem ngay\r\nBảo hành 7 ngày",
+    "price": 210000,
+    "regular_price": 210000,
+    "currency": "VND",
+    "brand": "Microsoft"
+  },
+  {
+    "type": "simple",
+    "title": "Key Microsoft Project 2021 Bản Quyền Vĩnh Viễn – Quản Lý Dự Án Chuyên Nghiệp",
+    "url": "https://premium69.com/san-pham/key-microsoft-project-2021-ban-quyen-vinh-vien/",
+    "image": "https://premium69.com/wp-content/uploads/2025/03/17.png",
+    "description": "Hướng dẫn kích hoạt: Xem ngay\r\nBảo hành 7 ngày",
+    "price": 220000,
+    "regular_price": 220000,
+    "currency": "VND",
+    "brand": "Microsoft"
+  },
+  {
+    "type": "simple",
+    "title": "Key Microsoft Visio 2016 bản quyền vĩnh viễn",
+    "url": "https://premium69.com/san-pham/key-microsoft-visio-2016-ban-quyen-vinh-vien/",
+    "image": "https://premium69.com/wp-content/uploads/2025/03/12.png",
+    "description": "Hướng dẫn kích hoạt: Xem ngay\r\nBảo hành 7 ngày",
+    "price": 200000,
+    "regular_price": 200000,
+    "currency": "VND",
+    "brand": "Microsoft"
+  },
+  {
+    "type": "simple",
+    "title": "Key Microsoft Visio 2019 bản quyền vĩnh viễn",
+    "url": "https://premium69.com/san-pham/key-microsoft-visio-2019-ban-quyen-vinh-vien/",
+    "image": "https://premium69.com/wp-content/uploads/2025/03/13.png",
+    "description": "Hướng dẫn kích hoạt: Xem ngay\r\nBảo hành 7 ngày",
+    "price": 210000,
+    "regular_price": 210000,
+    "currency": "VND",
+    "brand": "Microsoft"
+  },
+  {
+    "type": "simple",
+    "title": "Key Microsoft Visio 2021 bản quyền vĩnh viễn",
+    "url": "https://premium69.com/san-pham/key-microsoft-visio-2021-ban-quyen-vinh-vien/",
+    "image": "https://premium69.com/wp-content/uploads/2025/03/14.png",
+    "description": "Hướng dẫn kích hoạt: Xem ngay\r\nBảo hành 7 ngày",
+    "price": 220000,
+    "regular_price": 220000,
+    "currency": "VND",
+    "brand": "Microsoft"
+  }
+]

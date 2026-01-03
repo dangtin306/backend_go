@@ -1,0 +1,40 @@
+{
+  "vi": {
+    "login_required": "Bạn chưa đăng nhập",
+    "tele_config_missing": "Tài khoản chưa thêm cấu hình tele.",
+    "wait_time": "Bạn cần chờ %s để làm tiếp nhiệm vụ này",
+    "service_invalid": "Dịch vụ không đúng",
+    "crypto_code_invalid": "Mã crypto ko đúng",
+    "level_insufficient": "Cần đạt level %s để làm jop này, vui lòng nâng cấp tk",
+    "system_error": "Lỗi hệ thống mã lỗi: 707 vui lòng liên hệ admin",
+    "daily_limit_reached": "Mỗi ngày xem link %s lần",
+    "periodic_limit_reached": "%s ngày xem link 1 lần",
+    "try_now": "Ấn try now để nhận quà",
+    "insufficient_condition": "Chưa đủ điều kiện, đã làm: %s",
+    "app_required": "Cần tải app để sử dụng tính năng này",
+    "link_unavailable": "Không lấy được link vui lòng liên hệ admin",
+    "partner_error": "Lỗi đối tác vui lòng thử lại sau",
+    "curl_error": "Lỗi cURL vui lòng ib admin",
+    "no_redirect": "Lỗi Không có chuyển hướng. vui lòng ib admin",
+    "money_mission_minus": "số dư cần lớn hơn 0"
+  },
+  "en": {
+    "login_required": "You are not logged in",
+    "tele_config_missing": "Account has not added tele configuration.",
+    "wait_time": "You need to wait %s to continue this task",
+    "service_invalid": "Invalid service",
+    "crypto_code_invalid": "Invalid crypto code",
+    "level_insufficient": "Need to reach level %s to do this job, please upgrade your account",
+    "system_error": "System error code: 707 please contact admin",
+    "daily_limit_reached": "View link %s times per day",
+    "periodic_limit_reached": "View link once every %s days",
+    "try_now": "Click try now to receive the gift",
+    "insufficient_condition": "Insufficient condition, done: %s",
+    "app_required": "Need to download the app to use this feature",
+    "link_unavailable": "Unable to get link, please contact admin",
+    "partner_error": "Partner error, please try again later",
+    "curl_error": "cURL error, please message admin",
+    "no_redirect": "Error: No redirect. Please message admin",
+    "money_mission_minus": "The remainder must be greater than 0."
+  }
+}

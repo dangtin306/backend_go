@@ -1,0 +1,422 @@
+[
+  {
+    "api_category": "https://yeumoney.com",
+    "average_time": 211.75,
+    "iqr_stats": {
+      "k": 1.0,
+      "Q1": 178.0,
+      "Q3": 265.0,
+      "IQR": 87.0,
+      "lower": 91.0,
+      "upper": 352.0,
+      "n_original": 193,
+      "n_filtered": 168,
+      "n_removed": 25
+    }
+  },
+  {
+    "api_category": "https://hust.media/tele_mem",
+    "average_time": 18.642857142857142,
+    "iqr_stats": {
+      "k": 1.0,
+      "Q1": 16.0,
+      "Q3": 22.0,
+      "IQR": 6.0,
+      "lower": 10.0,
+      "upper": 28.0,
+      "n_original": 15,
+      "n_filtered": 14,
+      "n_removed": 1
+    }
+  },
+  {
+    "api_category": "https://hust.media/dice_love_0",
+    "average_time": 59.73770491803279,
+    "iqr_stats": {
+      "k": 1.0,
+      "Q1": 49.25,
+      "Q3": 79.0,
+      "IQR": 29.75,
+      "lower": 19.5,
+      "upper": 108.75,
+      "n_original": 142,
+      "n_filtered": 122,
+      "n_removed": 20
+    }
+  },
+  {
+    "api_category": "https://admob.google.com",
+    "average_time": 58.51111111111111,
+    "iqr_stats": {
+      "k": 1.0,
+      "Q1": 41.5,
+      "Q3": 79.0,
+      "IQR": 37.5,
+      "lower": 4.0,
+      "upper": 116.5,
+      "n_original": 52,
+      "n_filtered": 45,
+      "n_removed": 7
+    }
+  },
+  {
+    "api_category": "https://adrinolinks.in",
+    "average_time": 131.29166666666666,
+    "iqr_stats": {
+      "k": 1.0,
+      "Q1": 115.0,
+      "Q3": 152.5,
+      "IQR": 37.5,
+      "lower": 77.5,
+      "upper": 190.0,
+      "n_original": 27,
+      "n_filtered": 24,
+      "n_removed": 3
+    }
+  },
+  {
+    "api_category": "https://gplinks.com",
+    "average_time": 184.23529411764707,
+    "iqr_stats": {
+      "k": 1.0,
+      "Q1": 167.25,
+      "Q3": 214.0,
+      "IQR": 46.75,
+      "lower": 120.5,
+      "upper": 260.75,
+      "n_original": 18,
+      "n_filtered": 17,
+      "n_removed": 1
+    }
+  },
+  {
+    "api_category": "https://cpm.link",
+    "average_time": 37.5,
+    "iqr_stats": {
+      "k": 1.0,
+      "Q1": 33.0,
+      "Q3": 49.0,
+      "IQR": 16.0,
+      "lower": 17.0,
+      "upper": 65.0,
+      "n_original": 13,
+      "n_filtered": 10,
+      "n_removed": 3
+    }
+  },
+  {
+    "api_category": "https://droplink.co",
+    "average_time": 229.72727272727272,
+    "iqr_stats": {
+      "k": 1.0,
+      "Q1": 213.0,
+      "Q3": 258.0,
+      "IQR": 45.0,
+      "lower": 168.0,
+      "upper": 303.0,
+      "n_original": 27,
+      "n_filtered": 22,
+      "n_removed": 5
+    }
+  },
+  {
+    "api_category": "https://ez4short.com",
+    "average_time": 267.12,
+    "iqr_stats": {
+      "k": 1.0,
+      "Q1": 218.25,
+      "Q3": 328.5,
+      "IQR": 110.25,
+      "lower": 108.0,
+      "upper": 438.75,
+      "n_original": 28,
+      "n_filtered": 25,
+      "n_removed": 3
+    }
+  },
+  {
+    "api_category": "https://bbmkts.com",
+    "average_time": 123.02857142857142,
+    "iqr_stats": {
+      "k": 1.0,
+      "Q1": 81.0,
+      "Q3": 245.0,
+      "IQR": 164.0,
+      "lower": -83.0,
+      "upper": 409.0,
+      "n_original": 45,
+      "n_filtered": 35,
+      "n_removed": 10
+    }
+  },
+  {
+    "api_category": "https://hust.media/reports",
+    "average_time": 42.857142857142854,
+    "iqr_stats": {
+      "k": 1.0,
+      "Q1": 28.75,
+      "Q3": 69.75,
+      "IQR": 41.0,
+      "lower": -12.25,
+      "upper": 110.75,
+      "n_original": 16,
+      "n_filtered": 14,
+      "n_removed": 2
+    }
+  },
+  {
+    "api_category": "https://cutwin.com",
+    "average_time": 39.75,
+    "iqr_stats": {
+      "k": 1.0,
+      "Q1": 0.0,
+      "Q3": 74.75,
+      "IQR": 74.75,
+      "lower": -74.75,
+      "upper": 149.5,
+      "n_original": 4,
+      "n_filtered": 4,
+      "n_removed": 0
+    }
+  },
+  {
+    "api_category": "https://shortox.com",
+    "average_time": 144.07692307692307,
+    "iqr_stats": {
+      "k": 1.0,
+      "Q1": 126.0,
+      "Q3": 172.5,
+      "IQR": 46.5,
+      "lower": 79.5,
+      "upper": 219.0,
+      "n_original": 16,
+      "n_filtered": 13,
+      "n_removed": 3
+    }
+  },
+  {
+    "api_category": "https://link4m.com",
+    "average_time": 160.7674418604651,
+    "iqr_stats": {
+      "k": 1.0,
+      "Q1": 126.5,
+      "Q3": 198.0,
+      "IQR": 71.5,
+      "lower": 55.0,
+      "upper": 269.5,
+      "n_original": 59,
+      "n_filtered": 43,
+      "n_removed": 16
+    }
+  },
+  {
+    "api_category": "https://hust.media/web_search",
+    "average_time": 1546.6666666666667,
+    "iqr_stats": {
+      "k": 1.0,
+      "Q1": 384.5,
+      "Q3": 2305.0,
+      "IQR": 1920.5,
+      "lower": -1536.0,
+      "upper": 4225.5,
+      "n_original": 3,
+      "n_filtered": 3,
+      "n_removed": 0
+    }
+  },
+  {
+    "api_category": "https://hust.media/dice_love_30",
+    "average_time": 25.5,
+    "iqr_stats": {
+      "k": 1.0,
+      "Q1": 23.5,
+      "Q3": 27.5,
+      "IQR": 4.0,
+      "lower": 19.5,
+      "upper": 31.5,
+      "n_original": 4,
+      "n_filtered": 4,
+      "n_removed": 0
+    }
+  },
+  {
+    "api_category": "https://crypto-radio.eu",
+    "average_time": 422.25,
+    "iqr_stats": {
+      "k": 1.0,
+      "Q1": 399.0,
+      "Q3": 544.0,
+      "IQR": 145.0,
+      "lower": 254.0,
+      "upper": 689.0,
+      "n_original": 26,
+      "n_filtered": 20,
+      "n_removed": 6
+    }
+  },
+  {
+    "api_category": "https://hust.media/ptc_ads",
+    "average_time": 33.55555555555556,
+    "iqr_stats": {
+      "k": 1.0,
+      "Q1": 19.0,
+      "Q3": 58.0,
+      "IQR": 39.0,
+      "lower": -20.0,
+      "upper": 97.0,
+      "n_original": 9,
+      "n_filtered": 9,
+      "n_removed": 0
+    }
+  },
+  {
+    "api_category": "https://hust.media/dice_love_20",
+    "average_time": 28.375,
+    "iqr_stats": {
+      "k": 1.0,
+      "Q1": 25.25,
+      "Q3": 31.5,
+      "IQR": 6.25,
+      "lower": 19.0,
+      "upper": 37.75,
+      "n_original": 8,
+      "n_filtered": 8,
+      "n_removed": 0
+    }
+  },
+  {
+    "api_category": "https://linkpays.in",
+    "average_time": 286.42857142857144,
+    "iqr_stats": {
+      "k": 1.0,
+      "Q1": 167.0,
+      "Q3": 439.25,
+      "IQR": 272.25,
+      "lower": -105.25,
+      "upper": 711.5,
+      "n_original": 16,
+      "n_filtered": 14,
+      "n_removed": 2
+    }
+  },
+  {
+    "api_category": "https://shrinkme.io",
+    "average_time": 116.6923076923077,
+    "iqr_stats": {
+      "k": 1.0,
+      "Q1": 101.5,
+      "Q3": 140.5,
+      "IQR": 39.0,
+      "lower": 62.5,
+      "upper": 179.5,
+      "n_original": 15,
+      "n_filtered": 13,
+      "n_removed": 2
+    }
+  },
+  {
+    "api_category": "https://hust.media/dice_love_10",
+    "average_time": 26.352941176470587,
+    "iqr_stats": {
+      "k": 1.0,
+      "Q1": 23.5,
+      "Q3": 32.0,
+      "IQR": 8.5,
+      "lower": 15.0,
+      "upper": 40.5,
+      "n_original": 19,
+      "n_filtered": 17,
+      "n_removed": 2
+    }
+  },
+  {
+    "api_category": "https://clk.sh",
+    "average_time": 114.23076923076923,
+    "iqr_stats": {
+      "k": 1.0,
+      "Q1": 105.0,
+      "Q3": 131.0,
+      "IQR": 26.0,
+      "lower": 79.0,
+      "upper": 157.0,
+      "n_original": 17,
+      "n_filtered": 13,
+      "n_removed": 4
+    }
+  },
+  {
+    "api_category": "https://shrinkearn.com",
+    "average_time": 127.15789473684211,
+    "iqr_stats": {
+      "k": 1.0,
+      "Q1": 105.5,
+      "Q3": 157.25,
+      "IQR": 51.75,
+      "lower": 53.75,
+      "upper": 209.0,
+      "n_original": 22,
+      "n_filtered": 19,
+      "n_removed": 3
+    }
+  },
+  {
+    "api_category": "https://hust.media/tiktok_cmts",
+    "average_time": 108.38888888888889,
+    "iqr_stats": {
+      "k": 1.0,
+      "Q1": 83.25,
+      "Q3": 169.5,
+      "IQR": 86.25,
+      "lower": -3.0,
+      "upper": 255.75,
+      "n_original": 22,
+      "n_filtered": 18,
+      "n_removed": 4
+    }
+  },
+  {
+    "api_category": "https://hust.media/box_shares",
+    "average_time": 306.0,
+    "iqr_stats": {
+      "k": 1.0,
+      "Q1": 27.5,
+      "Q3": 622.75,
+      "IQR": 595.25,
+      "lower": -567.75,
+      "upper": 1218.0,
+      "n_original": 6,
+      "n_filtered": 6,
+      "n_removed": 0
+    }
+  },
+  {
+    "api_category": "https://hust.media/tik_cmts_ref",
+    "average_time": 37.25,
+    "iqr_stats": {
+      "k": 1.0,
+      "Q1": 21.5,
+      "Q3": 91.5,
+      "IQR": 70.0,
+      "lower": -48.5,
+      "upper": 161.5,
+      "n_original": 15,
+      "n_filtered": 12,
+      "n_removed": 3
+    }
+  },
+  {
+    "api_category": "https://pocolinks.com",
+    "average_time": 167.0,
+    "iqr_stats": {
+      "k": 1.0,
+      "Q1": 160.5,
+      "Q3": 179.5,
+      "IQR": 19.0,
+      "lower": 141.5,
+      "upper": 198.5,
+      "n_original": 3,
+      "n_filtered": 3,
+      "n_removed": 0
+    }
+  }
+]
