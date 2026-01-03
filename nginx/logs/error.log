@@ -193,3 +193,15 @@
 2026/01/03 04:58:44 [error] 28784#24648: OpenEvent("Global\ngx_quit_21348") failed (2: The system cannot find the file specified)
 2026/01/03 08:58:44 [notice] 4088#11552: signal process started
 2026/01/03 08:58:44 [error] 4088#11552: OpenEvent("Global\ngx_quit_9876") failed (2: The system cannot find the file specified)
+2026/01/03 11:51:07 [notice] 14828#9736: signal process started
+2026/01/03 11:51:07 [error] 14828#9736: OpenEvent("Global\ngx_quit_3396") failed (2: The system cannot find the file specified)
+2026/01/03 11:51:10 [emerg] 14156#10788: CreateDirectory() "C:\Users\DoKhacQuyen\Documents\backend_go\nginx/temp/client_body_temp" failed (3: The system cannot find the path specified)
+2026/01/03 12:17:02 [notice] 408#11816: signal process started
+2026/01/03 12:17:02 [error] 408#11816: OpenEvent("Global\ngx_quit_3396") failed (2: The system cannot find the file specified)
+2026/01/03 12:17:07 [emerg] 15916#9236: CreateDirectory() "C:\Users\DoKhacQuyen\Documents\backend_go\nginx/temp/client_body_temp" failed (3: The system cannot find the path specified)
+2026/01/03 12:35:55 [notice] 8468#12616: signal process started
+2026/01/03 12:35:55 [error] 8468#12616: OpenEvent("Global\ngx_quit_3396") failed (2: The system cannot find the file specified)
+2026/01/03 12:35:57 [emerg] 3156#2852: CreateDirectory() "C:\Users\DoKhacQuyen\Documents\backend_go\nginx/temp/client_body_temp" failed (3: The system cannot find the path specified)
+2026/01/03 12:44:05 [notice] 15896#1384: signal process started
+2026/01/03 12:44:05 [error] 15896#1384: OpenEvent("Global\ngx_quit_3396") failed (2: The system cannot find the file specified)
+2026/01/03 12:44:08 [emerg] 10152#2264: CreateDirectory() "C:\Users\DoKhacQuyen\Documents\backend_go\nginx/temp/client_body_temp" failed (3: The system cannot find the path specified)
