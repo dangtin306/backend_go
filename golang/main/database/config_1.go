@@ -215,16 +215,16 @@ func isSelectQuery(query string) bool {
 func LoadConfig() Config {
 	host := firstEnv("DB_HOST", "MYSQL_HOST")
 	if host == "" {
-		host = "localhost"
+		host = "vip.tecom.pro"
 	}
 	port := readEnvInt("DB_PORT", 3306)
 	user := firstEnv("DB_USER", "MYSQL_USER")
 	if user == "" {
-		user = "root"
+		user = "hust_media_vip"
 	}
 	pass := firstEnv("DB_PASS", "MYSQL_PASSWORD")
 	if pass == "" {
-		pass = "Thugiang@xyz"
+		pass = "hust_media_vip"
 	}
 	name := firstEnv("DB_NAME", "MYSQL_DB")
 	if name == "" {
