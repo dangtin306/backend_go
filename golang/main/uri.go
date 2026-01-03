@@ -41,5 +41,6 @@ func registerRoutes(r *gin.Engine) {
 	r.Any("/profile/plan/plan_orders", profile.PlanOrdersHandler)
 	r.Any("/profile/plan/list_plan", profile.ListPlanHandler)
 	r.Any("/profile/setting/get_status", profile.GetStatusHandler)
+	r.Any("/profile/setting/get_balance", profile.GetStatusHandler)
 	r.Any("/database/export_data", database.ExportDataHandler)
 }
