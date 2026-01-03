@@ -3,8 +3,10 @@ package database
 import (
 	"context"
 	"database/sql"
+	"encoding/json"
 	"fmt"
 	"os"
+	"path/filepath"
 	"strconv"
 	"strings"
 	"sync"
@@ -213,24 +215,50 @@ func isSelectQuery(query string) bool {
 }
 
 func LoadConfig() Config {
+	fileCfg, _ := loadConfigFile()
 	host := firstEnv("DB_HOST", "MYSQL_HOST")
+	if host == "" {
+		host = fileCfg.Host
+	}
 	if host == "" {
 		host = "vip.tecom.pro"
 	}
-	port := readEnvInt("DB_PORT", 3306)
+
+	port := 0
+	if envPort, ok := firstEnvInt("DB_PORT", "MYSQL_PORT"); ok {
+		port = envPort
+	}
+	if port == 0 {
+		port = fileCfg.Port
+	}
+	if port == 0 {
+		port = 3306
+	}
 	user := firstEnv("DB_USER", "MYSQL_USER")
+	if user == "" {
+		user = fileCfg.User
+	}
 	if user == "" {
 		user = "hust_media_vip"
 	}
 	pass := firstEnv("DB_PASS", "MYSQL_PASSWORD")
 	if pass == "" {
+		pass = fileCfg.Password
+	}
+	if pass == "" {
 		pass = "hust_media_vip"
 	}
 	name := firstEnv("DB_NAME", "MYSQL_DB")
 	if name == "" {
+		name = fileCfg.Database
+	}
+	if name == "" {
 		name = "hustmedi_777"
 	}
 	params := firstEnv("DB_PARAMS", "MYSQL_PARAMS")
+	if params == "" {
+		params = fileCfg.Params
+	}
 	if params == "" {
 		params = "charset=utf8mb4&parseTime=true&loc=Local"
 	}
@@ -264,6 +292,21 @@ func firstEnv(keys ...string) string {
 	return ""
 }
 
+func firstEnvInt(keys ...string) (int, bool) {
+	for _, key := range keys {
+		value := strings.TrimSpace(os.Getenv(key))
+		if value == "" {
+			continue
+		}
+		parsed, err := strconv.Atoi(value)
+		if err != nil {
+			continue
+		}
+		return parsed, true
+	}
+	return 0, false
+}
+
 func readEnvInt(key string, fallback int) int {
 	raw := strings.TrimSpace(os.Getenv(key))
 	if raw == "" {
@@ -274,4 +317,71 @@ func readEnvInt(key string, fallback int) int {
 		return fallback
 	}
 	return value
+}
+
+func loadConfigFile() (Config, bool) {
+	baseDir, err := os.Getwd()
+	if err != nil {
+		baseDir = "."
+	}
+	path := filepath.Join(baseDir, "main", "database", "config_1.json")
+	data, err := os.ReadFile(path)
+	if err != nil {
+		return Config{}, false
+	}
+
+	var raw map[string]any
+	if err := json.Unmarshal(data, &raw); err != nil {
+		return Config{}, false
+	}
+
+	cfg := Config{
+		Host:     readString(raw, "host"),
+		User:     readString(raw, "user"),
+		Password: readString(raw, "password"),
+		Database: readString(raw, "database"),
+		Params:   readString(raw, "params"),
+	}
+	if port, ok := readInt(raw, "port"); ok {
+		cfg.Port = port
+	}
+
+	return cfg, true
+}
+
+func readString(values map[string]any, key string) string {
+	if values == nil {
+		return ""
+	}
+	value, ok := values[key]
+	if !ok {
+		return ""
+	}
+	if text, ok := value.(string); ok {
+		return strings.TrimSpace(text)
+	}
+	return ""
+}
+
+func readInt(values map[string]any, key string) (int, bool) {
+	if values == nil {
+		return 0, false
+	}
+	value, ok := values[key]
+	if !ok {
+		return 0, false
+	}
+	switch v := value.(type) {
+	case float64:
+		return int(v), true
+	case int:
+		return v, true
+	case int64:
+		return int(v), true
+	case string:
+		if parsed, err := strconv.Atoi(strings.TrimSpace(v)); err == nil {
+			return parsed, true
+		}
+	}
+	return 0, false
 }
