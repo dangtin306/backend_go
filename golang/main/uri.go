@@ -3,6 +3,7 @@ package main
 import (
 	"net/http"
 
+	"hust_backend/main/database"
 	"hust_backend/p2p/media/social/telegram"
 	"hust_backend/p2p/mission"
 	"hust_backend/p2p/mission/p2p_link"
@@ -39,4 +40,5 @@ func registerRoutes(r *gin.Engine) {
 
 	r.Any("/profile/plan/plan_orders", profile.PlanOrdersHandler)
 	r.Any("/profile/plan/list_plan", profile.ListPlanHandler)
+	r.Any("/database/export_data", database.ExportDataHandler)
 }
