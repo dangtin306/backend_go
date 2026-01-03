@@ -46,7 +46,6 @@ func GetlinkRunHandler(c *gin.Context) {
 		return
 	}
 
-	print_json := api.MakePrintJSON(c)
 	payload := parseGetlinkPayload(c)
 	national_market := strings.TrimSpace(payload.national_market)
 	if !payload.has_national {
@@ -87,26 +86,26 @@ func GetlinkRunHandler(c *gin.Context) {
 	money := toFloat(toString(play_sql.Query("SELECT `money` FROM `users` WHERE `id` = '" + id_users + "'  ").Fetch_array()["money"]))
 
 	if id_users == "" || apikey == "" || my_username == "" {
-		print_json(api.J(
+		api.Print_json(c,
 			"status", "0",
 			"message", langValue(lang, "login_required"),
-		))
+		)
 		return
 	}
 
 	if phone == "" || checkphone != "YES" || id_users == "" {
-		print_json(api.J(
+		api.Print_json(c,
 			"status", "0",
 			"message", langValue(lang, "tele_config_missing"),
-		))
+		)
 		return
 	}
 
 	if money < 0 {
-		print_json(api.J(
+		api.Print_json(c,
 			"status", "0",
 			"message", langValue(lang, "money_mission_minus"),
-		))
+		)
 		return
 	}
 
@@ -139,34 +138,34 @@ func GetlinkRunHandler(c *gin.Context) {
 		if last_mission_id != "" {
 			old_link := toString(play_sql.Query("SELECT `link` FROM `misson_shorten_link` WHERE `id_misson` =  '" + last_mission_id + "' ORDER BY id desc limit 1  ").Fetch_array()["link"])
 			if old_link != "" {
-				print_json(api.J(
+				api.Print_json(c,
 					"status", "1",
 					"message", langValue(lang, "try_now"),
 					"link", old_link,
-				))
+				)
 				return
 			}
 		}
-		print_json(api.J(
+		api.Print_json(c,
 			"status", "0",
 			"message", fmt.Sprintf(langValue(lang, "wait_time"), strconv.Itoa(time_delay)),
-		))
+		)
 		return
 	}
 
 	if api_url == "" || type_api == "" {
-		print_json(api.J(
+		api.Print_json(c,
 			"status", "0",
 			"message", langValue(lang, "service_invalid"),
-		))
+		)
 		return
 	}
 
 	if !tools && chedo != "okluonhe" && (web3_service != service_id || web3_apikey != apikey) {
-		print_json(api.J(
+		api.Print_json(c,
 			"status", "0",
 			"message", langValue(lang, "crypto_code_invalid"),
-		))
+		)
 		return
 	}
 
@@ -188,34 +187,34 @@ func GetlinkRunHandler(c *gin.Context) {
 	namelevel := toString(play_sql.Query("SELECT `namelevel` FROM `capdotaikhoan` WHERE `id` =  '" + level_mission + "'  ").Fetch_array()["namelevel"])
 
 	if level_users < level_mission_int {
-		print_json(api.J(
+		api.Print_json(c,
 			"status", "0",
 			"message", fmt.Sprintf(langValue(lang, "level_insufficient"), namelevel),
-		))
+		)
 		return
 	}
 
 	if chedo != "okluonhe" && !tools && strings.Contains(type_api, "only_app") && device_id == "" {
-		print_json(api.J(
+		api.Print_json(c,
 			"status", "0",
 			"message", langValue(lang, "system_error"),
-		))
+		)
 		return
 	}
 
 	if chedo != "okluonhe" && !tools && views_count >= maxorder_int && minorder_int != 0 {
-		print_json(api.J(
+		api.Print_json(c,
 			"status", "0",
 			"message", fmt.Sprintf(langValue(lang, "daily_limit_reached"), strconv.Itoa(maxorder_int)),
-		))
+		)
 		return
 	}
 
 	if chedo != "okluonhe" && !tools && views_count > 0 && minorder_int == 0 {
-		print_json(api.J(
+		api.Print_json(c,
 			"status", "0",
 			"message", fmt.Sprintf(langValue(lang, "periodic_limit_reached"), strconv.Itoa(maxorder_int)),
-		))
+		)
 		return
 	}
 
@@ -225,11 +224,11 @@ func GetlinkRunHandler(c *gin.Context) {
 		xuly_misson_shorten_link = toString(play_sql.Query("SELECT `link` FROM `misson_shorten_link` WHERE  DATE(mission_createdate) = CURRENT_DATE() AND `id_misson` =  '" + id_misson_xuly + "' ORDER BY id desc limit 1  ").Fetch_array()["link"])
 	}
 	if xuly_misson_shorten_link != "" {
-		print_json(api.J(
+		api.Print_json(c,
 			"status", "1",
 			"message", langValue(lang, "try_now"),
 			"link", xuly_misson_shorten_link,
-		))
+		)
 		return
 	}
 
@@ -253,7 +252,7 @@ func GetlinkRunHandler(c *gin.Context) {
 		chedo:            chedo,
 	})
 
-	print_json(result)
+	api.Print_json(c, result)
 }
 
 func parseGetlinkPayload(c *gin.Context) getlinkRequest {

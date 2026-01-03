@@ -155,7 +155,7 @@ def _stop_by_port(port):
             [
                 "powershell",
                 "-NoProfile",
-                "-Command",
+                "-Command", 
                 (
                     "Get-NetTCPConnection -LocalPort "
                     + str(port)

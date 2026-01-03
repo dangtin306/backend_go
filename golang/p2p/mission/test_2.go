@@ -8,10 +8,7 @@ import (
 )
 
 func GetlinkTest2Handler(c *gin.Context) {
-	print_json := api.MakePrintJSON(c)
 	var value = play_sql.Query("SELECT * FROM `users` WHERE `id` = 207638 ORDER BY `id` DESC").Fetch_array()["money"]
 
-	print_json(api.J(
-		"value", value,
-	))
+	api.Print_json(c, "value", value)
 }

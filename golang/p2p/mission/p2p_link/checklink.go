@@ -26,7 +26,6 @@ func ChecklinkHandler(c *gin.Context) {
 		return
 	}
 
-	print_json := api.MakePrintJSON(c)
 	apikey := strings.TrimSpace(c.Query("apikey"))
 	category := strings.TrimSpace(c.Query("category"))
 	service_id := strings.TrimSpace(c.Query("service"))
@@ -42,18 +41,18 @@ func ChecklinkHandler(c *gin.Context) {
 	level_users = toString(play_sql.Query("SELECT `level` FROM `users2` WHERE `id_users` = '"+id_users+"' ").Fetch_array()["level"])
 
 	if category == "rollup_123456" && email == "" {
-		print_json(api.J(
+		api.Print_json(c,
 			"status", "0",
 			"message", "Vui lòng liên kết google để làm nhiệm vụ này",
 			"redirect", "/shop/profiles?webappmode=showadview",
-		))
+		)
 		return
 	}
 
 	query := buildMissionQuery(service_id, id_users, category)
 	rows, err := queryRows(query)
 	if err != nil {
-		print_json([]map[string]any{})
+		api.Print_json(c, []map[string]any{})
 		return
 	}
 
@@ -95,7 +94,7 @@ func ChecklinkHandler(c *gin.Context) {
 		results = append(results, item)
 	}
 
-	print_json(results)
+	api.Print_json(c, results)
 }
 
 func buildMissionQuery(service_id, id_users, category string) string {

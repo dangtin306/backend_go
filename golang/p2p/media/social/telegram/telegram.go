@@ -13,13 +13,10 @@ import (
 )
 
 func AutoReplyHandler(c *gin.Context) {
-	print_json := api.MakePrintJSON(c)
 	text := strings.TrimSpace(c.Query("text"))
 	username := strings.TrimSpace(c.Query("username"))
 	if text == "" || username == "" {
-		print_json(api.J(
-			"error", "Missing text or username",
-		), http.StatusBadRequest)
+		api.Print_json(c, "error", "Missing text or username", http.StatusBadRequest)
 		return
 	}
 
@@ -39,15 +36,9 @@ func AutoReplyHandler(c *gin.Context) {
 	output, err := cmd.CombinedOutput()
 	result := strings.TrimSpace(string(output))
 	if err != nil {
-		print_json(api.J(
-			"error", err.Error(),
-			"result", result,
-		), http.StatusInternalServerError)
+		api.Print_json(c, "error", err.Error(), "result", result, http.StatusInternalServerError)
 		return
 	}
 
-	print_json(api.J(
-		"status", "ok",
-		"result", result,
-	))
+	api.Print_json(c, "status", "ok", "result", result)
 }

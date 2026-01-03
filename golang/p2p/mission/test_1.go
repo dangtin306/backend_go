@@ -8,9 +8,6 @@ import (
 )
 
 func GetlinkTest1Handler(c *gin.Context) {
-	print_json := api.MakePrintJSON(c)
 	var create = play_sql.Query("INSERT INTO `misson_shorten_code` SET `tele_code` = '1', `createdate` = now()")
-	print_json(api.J(
-		"status", create,
-	))
+	api.Print_json(c, "status", create)
 }
