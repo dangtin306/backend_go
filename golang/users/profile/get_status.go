@@ -44,10 +44,19 @@ func GetStatusHandler(c *gin.Context) {
 	var username string
 	var money int64
 
-	query := "SELECT username, COALESCE(money, 0) FROM users WHERE `key` = ? LIMIT 1"
+	// query := "SELECT username, COALESCE(money, 0) FROM users WHERE `key` = ? LIMIT 1"
+	// Logic:
+	// - Từ bảng 'users_key' lấy 'id_users' dựa vào 'users_apikey'.
+	// - JOIN sang bảng 'users' bằng cách so sánh: users.id = users_key.id_users
+	query := `
+		SELECT u.username, COALESCE(u.money, 0)
+		FROM users u
+		JOIN users_key k ON u.id = k.id_users
+		WHERE k.users_apikey = ?
+		LIMIT 1`
 
 	err = db.QueryRow(query, apiKey).Scan(&username, &money)
-
+	// printf(err)
 	if err != nil {
 		// Lỗi không tìm thấy hoặc lỗi SQL
 		fmt.Println("Debug lỗi SQL:", err) // In ra terminal để debug nếu cần
