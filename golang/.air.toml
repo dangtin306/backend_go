@@ -1,0 +1,12 @@
+root = "."
+tmp_dir = "tmp"
+
+[build]
+cmd = "go build -o tmp/main.exe ./main"
+entrypoint = "tmp/main.exe"
+
+include_ext = ["go"]
+exclude_dir = ["tmp", "vendor", "__pycache__", ".git"]
+
+[log]
+time = true
