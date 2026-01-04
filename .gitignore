@@ -2,3 +2,4 @@ golang/main/database/config_1.json
 *.log
 *.pid
 *.pyc
+*.session
