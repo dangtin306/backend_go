@@ -1,13 +1,13 @@
 {
   "jobs": [
     {
-      "name": "counter-10s",
-      "task": "increment_counter",
+      "name_cron": "counter-10s",
+      "task_cron": "increment_counter",
       "interval_seconds": 10
     },
     {
-      "name": "counter-15s",
-      "task": "increment_counter",
+      "name_cron": "counter-15s",
+      "task_cron": "increment_counter",
       "interval_seconds": 15
     }
   ]

@@ -26,8 +26,8 @@ type schedulerConfig struct {
 }
 
 type jobConfig struct {
-	Name            string `json:"name"`
-	Task            string `json:"task"`
+	Name            string `json:"name_cron"`
+	Task            string `json:"task_cron"`
 	IntervalSeconds int    `json:"interval_seconds"`
 }
 
