@@ -5,3 +5,4 @@ golang/main/database/config_1.json
 *.pyc
 *.session
 *.txt
+*.session-journal
