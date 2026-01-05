@@ -30,7 +30,7 @@ type jobConfig struct {
 	Name            string  `json:"name_cron"`
 	Task            string  `json:"task_cron"`
 	IntervalSeconds float64 `json:"interval_seconds"`
-	Status          bool    `json:"status_cron"`
+	Status          *bool   `json:"status_cron"`
 	AtTime          string  `json:"at_time_cron"`
 }
 
@@ -58,7 +58,7 @@ func StartCounter() error {
 
 	for _, job := range config.Jobs {
 		// 1. Kiểm tra Status
-		if !job.Status {
+		if !jobEnabled(job) {
 			log.Printf("⚠️  [Job: %s] Đang TẮT -> Bỏ qua", job.Name)
 			continue
 		}
@@ -242,4 +242,11 @@ func configPath() string {
 		return configFileName
 	}
 	return filepath.Join(filepath.Dir(file), configFileName)
+}
+
+func jobEnabled(job jobConfig) bool {
+	if job.Status == nil {
+		return true
+	}
+	return *job.Status
 }
