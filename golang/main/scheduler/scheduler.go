@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"log"
+	"net/http"
 	"os"
 	"path/filepath"
 	"runtime"
@@ -22,13 +23,15 @@ var schedulerInstance gocron.Scheduler
 var counterMu sync.Mutex
 
 type schedulerConfig struct {
-	Jobs []jobConfig `json:"jobs"`
+	Jobs []jobConfig `json:"jobs_cron"`
 }
 
 type jobConfig struct {
-	Name            string `json:"name_cron"`
-	Task            string `json:"task_cron"`
-	IntervalSeconds int    `json:"interval_seconds"`
+	Name            string  `json:"name_cron"`
+	Task            string  `json:"task_cron"`
+	IntervalSeconds float64 `json:"interval_seconds"`
+	Status          bool    `json:"status_cron"`
+	AtTime          string  `json:"at_time_cron"`
 }
 
 func StartCounter() error {
@@ -54,26 +57,56 @@ func StartCounter() error {
 	}
 
 	for _, job := range config.Jobs {
+		// 1. Kiểm tra Status
+		if !job.Status {
+			log.Printf("⚠️  [Job: %s] Đang TẮT -> Bỏ qua", job.Name)
+			continue
+		}
+
+		// 2. Kiểm tra Interval
+		if job.IntervalSeconds <= 0 {
+			log.Printf("❌ [Job: %s] Lỗi: interval_seconds phải > 0", job.Name)
+			continue
+		}
+
 		taskName := job.Task
 		if taskName == "" {
 			taskName = "increment_counter"
 		}
 
-		task, err := taskFor(taskName)
+		// [THAY ĐỔI] Truyền job.Name vào hàm taskFor để nó biết tên job
+		task, err := taskFor(taskName, job.Name)
 		if err != nil {
 			return err
 		}
-		if job.IntervalSeconds <= 0 {
-			return fmt.Errorf("invalid interval_seconds for job %q", job.Name)
+
+		options := []gocron.JobOption{
+			gocron.WithName(job.Name),
 		}
 
-		options := []gocron.JobOption{}
-		if job.Name != "" {
-			options = append(options, gocron.WithName(job.Name))
+		// 3. Xử lý AtTime
+		if job.AtTime != "" {
+			startTime, err := parseTimeToday(job.AtTime)
+			if err != nil {
+				log.Printf("❌ [Job: %s] Lỗi giờ: %v", job.Name, err)
+			} else {
+				now := time.Now()
+				if startTime.After(now) {
+					log.Printf("⏳ [Job: %s] Hẹn giờ chạy lúc %s", job.Name, startTime.Format("15:04:05"))
+					options = append(options, gocron.WithStartAt(
+						gocron.WithStartDateTime(startTime),
+					))
+				} else {
+					log.Printf("▶️  [Job: %s] Đã qua giờ hẹn (%s) -> Chạy ngay", job.Name, job.AtTime)
+				}
+			}
 		}
+
+		// 4. Tạo Job Loop
+		duration := time.Duration(job.IntervalSeconds * float64(time.Second))
 
 		_, err = scheduler.NewJob(
-			gocron.DurationJob(time.Duration(job.IntervalSeconds)*time.Second),
+			gocron.DurationJob(duration),
 			gocron.NewTask(task),
 			options...,
 		)
@@ -87,46 +120,85 @@ func StartCounter() error {
 	return nil
 }
 
+// Hàm parse giờ
+func parseTimeToday(timeStr string) (time.Time, error) {
+	now := time.Now()
+	parts := strings.Split(timeStr, ":")
+	h, m, s := 0, 0, 0
+	var err error
+
+	if len(parts) >= 2 {
+		h, err = strconv.Atoi(parts[0])
+		if err != nil {
+			return time.Time{}, err
+		}
+		m, err = strconv.Atoi(parts[1])
+		if err != nil {
+			return time.Time{}, err
+		}
+	}
+	if len(parts) == 3 {
+		s, err = strconv.Atoi(parts[2])
+		if err != nil {
+			return time.Time{}, err
+		}
+	}
+	if len(parts) < 2 || len(parts) > 3 {
+		return time.Time{}, fmt.Errorf("sai định dạng (dùng HH:MM)")
+	}
+
+	return time.Date(now.Year(), now.Month(), now.Day(), h, m, s, 0, now.Location()), nil
+}
+
 func loadConfig() (schedulerConfig, error) {
 	data, err := os.ReadFile(configPath())
 	if err != nil {
 		return schedulerConfig{}, err
 	}
-
 	var config schedulerConfig
 	if err := json.Unmarshal(data, &config); err != nil {
 		return schedulerConfig{}, err
 	}
-
 	return config, nil
 }
 
-func taskFor(name string) (func(), error) {
-	switch name {
+// [THAY ĐỔI] Hàm taskFor nhận thêm jobName và trả về hàm con (Closure)
+func taskFor(taskType string, jobName string) (func(), error) {
+	switch taskType {
 	case "increment_counter":
-		return incrementCounter, nil
+		// Trả về hàm nặc danh đã "gói" jobName vào bên trong
+		return func() { incrementCounter(jobName) }, nil
+	case "ping_google":
+		return func() { pingGoogle(jobName) }, nil
 	default:
-		return nil, fmt.Errorf("unknown task %q", name)
+		return nil, fmt.Errorf("unknown task %q", taskType)
 	}
 }
 
-func incrementCounter() {
+// [THAY ĐỔI] Nhận jobName để in ra log
+func pingGoogle(jobName string) {
+	client := http.Client{Timeout: 10 * time.Second}
+	resp, err := client.Get("https://www.google.com")
+	if err != nil {
+		log.Printf("[Job: %s] ❌ Ping Google Fail: %v", jobName, err)
+		return
+	}
+	defer resp.Body.Close()
+	// [HIỂN THỊ TÊN JOB]
+	log.Printf("[Job: %s] ✅ Ping Google Status: %s", jobName, resp.Status)
+}
+
+// [THAY ĐỔI] Nhận jobName để in ra log
+func incrementCounter(jobName string) {
 	counterMu.Lock()
 	defer counterMu.Unlock()
 
-	count, err := readCounter()
-	if err != nil {
-		log.Printf("read counter: %v", err)
-		return
-	}
-
+	count, _ := readCounter()
 	count++
-	if err := writeCounter(count); err != nil {
-		log.Printf("write counter: %v", err)
-		return
-	}
+	writeCounter(count)
 
-	log.Printf("counter: %d", count)
+	// [HIỂN THỊ TÊN JOB]
+	log.Printf("[Job: %s] 🔢 Counter tăng lên: %d", jobName, count)
 }
 
 func ensureCounterFile() error {
@@ -147,7 +219,7 @@ func readCounter() (int, error) {
 	}
 	text := strings.TrimSpace(string(data))
 	if text == "" {
-		return 0, fmt.Errorf("empty counter file")
+		return 0, nil
 	}
 	return strconv.Atoi(text)
 }
