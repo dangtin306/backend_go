@@ -1,14 +1,23 @@
 {
   "jobs": [
     {
-      "name_cron": "counter-10s",
+      "name_cron": "Counter chạy 10s/lần",
       "task_cron": "increment_counter",
-      "interval_seconds": 10
+      "interval_seconds": 10,
+      "status_cron": true
     },
     {
-      "name_cron": "counter-15s",
-      "task_cron": "increment_counter",
-      "interval_seconds": 15
+      "name_cron": "Ping Google 1.5 ngày/lần",
+      "task_cron": "ping_google",
+      "interval_seconds": 129600,
+      "status_cron": true
+    },
+    {
+      "name_cron": "Săn Sale (Bắt đầu lúc 23:00, lặp mỗi 1.5s)",
+      "task_cron": "ping_google",
+      "interval_seconds": 1.5,
+      "status_cron": true,
+      "at_time": "18:25"
     }
   ]
 }
