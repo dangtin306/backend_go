@@ -1,0 +1,14 @@
+{
+  "jobs": [
+    {
+      "name": "counter-10s",
+      "task": "increment_counter",
+      "interval_seconds": 10
+    },
+    {
+      "name": "counter-15s",
+      "task": "increment_counter",
+      "interval_seconds": 15
+    }
+  ]
+}
