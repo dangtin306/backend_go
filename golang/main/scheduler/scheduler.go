@@ -16,30 +16,30 @@ import (
 	"github.com/go-co-op/gocron/v2"
 )
 
-// --- Tên file cấu hình và file lưu số đếm ---
 const counterFileName = "test.txt"
 const configFileName = "scheduler.json"
 
 var schedulerInstance gocron.Scheduler
 var counterMu sync.Mutex
 
-// --- [CẤU TRÚC STRUCT KHỚP VỚI JSON CỦA BẠN] ---
+// --- STRUCT ---
 
 type schedulerConfig struct {
-	Categories []categoryConfig `json:"categories_cron"` // Khớp với JSON: categories_cron
+	Categories []categoryConfig `json:"categories_cron"`
 }
 
 type categoryConfig struct {
-	Name     string      `json:"name_category"` // Khớp với JSON: name_category
-	Services []jobConfig `json:"services_cron"` // Khớp với JSON: services_cron
+	Name     string      `json:"name_category"`
+	Services []jobConfig `json:"services_cron"`
 }
 
 type jobConfig struct {
-	Name            string  `json:"name_cron"`        // Khớp: name_cron
-	Task            string  `json:"task_cron"`        // Khớp: task_cron
-	IntervalSeconds float64 `json:"interval_seconds"` // Khớp: interval_seconds
-	Status          bool    `json:"status_cron"`      // Khớp: status_cron
-	AtTime          string  `json:"at_time_cron"`     // Khớp: at_time_cron
+	Name            string  `json:"name_cron"`
+	Task            string  `json:"task_cron"`
+	IntervalSeconds float64 `json:"interval_seconds"`
+	Status          bool    `json:"status_cron"`
+	AtTime          string  `json:"at_time_cron"`
+	Url             string  `json:"url_cron"` // [MỚI] Link cần ping
 }
 
 // -----------------------------------------------------
@@ -48,56 +48,45 @@ func StartCounter() error {
 	if schedulerInstance != nil {
 		return nil
 	}
-	// Tạo file test.txt nếu chưa có
 	if err := ensureCounterFile(); err != nil {
 		return err
 	}
 
-	// Load file JSON
 	config, err := loadConfig()
 	if err != nil {
 		return err
 	}
 
-	// Khởi tạo Scheduler
 	scheduler, err := gocron.NewScheduler()
 	if err != nil {
 		return err
 	}
 
 	if len(config.Categories) == 0 {
-		return fmt.Errorf("file json không có categories_cron nào")
+		return fmt.Errorf("config empty")
 	}
 
-	// [VÒNG LẶP 1] Duyệt qua từng Category
 	for _, category := range config.Categories {
-
-		// [VÒNG LẶP 2] Duyệt qua từng Job (Service) trong Category đó
 		for _, job := range category.Services {
-
-			// Tạo tên hiển thị log dạng: "System Tasks > Counter Job"
 			fullName := fmt.Sprintf("%s > %s", category.Name, job.Name)
 
-			// 1. Kiểm tra Status: Nếu false thì bỏ qua
 			if !job.Status {
-				log.Printf("⚠️  [%s] Đang TẮT (Status=false) -> Bỏ qua", fullName)
+				log.Printf("⚠️  [%s] OFF -> Skip", fullName)
 				continue
 			}
 
-			// 2. Kiểm tra Interval: Phải có thời gian lặp
 			if job.IntervalSeconds <= 0 {
-				log.Printf("❌ [%s] Lỗi: interval_seconds phải lớn hơn 0", fullName)
+				log.Printf("❌ [%s] Lỗi: interval_seconds <= 0", fullName)
 				continue
 			}
 
-			// Xác định loại Task (increment_counter hay ping_google)
 			taskName := job.Task
 			if taskName == "" {
 				taskName = "increment_counter"
 			}
 
-			// Truyền fullName vào task để in log đẹp
-			task, err := taskFor(taskName, fullName)
+			// Truyền Url vào hàm taskFor
+			task, err := taskFor(taskName, fullName, job.Url)
 			if err != nil {
 				return err
 			}
@@ -106,27 +95,23 @@ func StartCounter() error {
 				gocron.WithName(fullName),
 			}
 
-			// 3. Xử lý Hẹn giờ bắt đầu (at_time_cron)
 			if job.AtTime != "" {
 				startTime, err := parseTimeToday(job.AtTime)
 				if err != nil {
-					log.Printf("❌ [%s] Lỗi định dạng giờ (at_time_cron): %v", fullName, err)
+					log.Printf("❌ [%s] Lỗi giờ (at_time_cron): %v", fullName, err)
 				} else {
 					now := time.Now()
-					// Chỉ hẹn giờ nếu thời gian đó ở Tương Lai
 					if startTime.After(now) {
-						log.Printf("⏳ [%s] Hẹn giờ chạy lúc %s", fullName, startTime.Format("15:04:05"))
+						log.Printf("⏳ [%s] Hẹn giờ lúc %s", fullName, startTime.Format("15:04:05"))
 						options = append(options, gocron.WithStartAt(
 							gocron.WithStartDateTime(startTime),
 						))
 					} else {
-						// Nếu đã qua giờ hẹn thì chạy luôn
-						log.Printf("▶️  [%s] Đã qua giờ hẹn (%s) -> Chạy ngay", fullName, job.AtTime)
+						log.Printf("▶️  [%s] Quá giờ (%s) -> Chạy ngay", fullName, job.AtTime)
 					}
 				}
 			}
 
-			// 4. Tạo Job chạy lặp lại
 			duration := time.Duration(job.IntervalSeconds * float64(time.Second))
 			_, err = scheduler.NewJob(
 				gocron.DurationJob(duration),
@@ -144,69 +129,78 @@ func StartCounter() error {
 	return nil
 }
 
-// --- LOGIC CÁC TASK ---
+// --- LOGIC TASK ---
 
-func taskFor(taskType string, fullName string) (func(), error) {
+func taskFor(taskType string, fullName string, url string) (func(), error) {
 	switch taskType {
 	case "increment_counter":
 		return func() { incrementCounter(fullName) }, nil
-	case "ping_google":
-		return func() { pingGoogle(fullName) }, nil
+
+	case "ping_url": // Task dùng link từ JSON
+		return func() { pingUrl(fullName, url) }, nil
+
+	case "ping_google": // Task cũ (giữ lại cho tương thích)
+		return func() { pingUrl(fullName, "https://www.google.com") }, nil
+
 	default:
-		return nil, fmt.Errorf("không tìm thấy task: %q", taskType)
+		return nil, fmt.Errorf("unknown task: %q", taskType)
 	}
 }
 
-func pingGoogle(fullName string) {
+func pingUrl(fullName string, url string) {
+	if url == "" {
+		log.Printf("[%s] ❌ Lỗi: Chưa điền url_cron trong JSON!", fullName)
+		return
+	}
+
 	client := http.Client{Timeout: 10 * time.Second}
-	resp, err := client.Get("https://www.google.com")
+	resp, err := client.Get(url)
 	if err != nil {
-		log.Printf("[%s] ❌ Ping Lỗi: %v", fullName, err)
+		log.Printf("[%s] ❌ Ping [%s] Fail: %v", fullName, url, err)
 		return
 	}
 	defer resp.Body.Close()
-	log.Printf("[%s] ✅ Ping Google: %s", fullName, resp.Status)
+	log.Printf("[%s] ✅ Ping [%s] -> Status: %s", fullName, url, resp.Status)
 }
 
 func incrementCounter(fullName string) {
 	counterMu.Lock()
 	defer counterMu.Unlock()
-
 	count, _ := readCounter()
 	count++
 	writeCounter(count)
-
 	log.Printf("[%s] 🔢 Counter: %d", fullName, count)
 }
 
-// --- CÁC HÀM TIỆN ÍCH ---
+// --- TIỆN ÍCH (ĐÃ SỬA LỖI BIẾN ERR) ---
 
-// Hàm parse giờ: HH:MM hoặc HH:MM:SS của ngày hôm nay
 func parseTimeToday(timeStr string) (time.Time, error) {
 	now := time.Now()
 	parts := strings.Split(timeStr, ":")
-	h, m, s := 0, 0, 0
-	var err error
 
-	if len(parts) >= 2 {
-		h, err = strconv.Atoi(parts[0])
-		if err != nil {
-			return time.Time{}, err
-		}
-		m, err = strconv.Atoi(parts[1])
-		if err != nil {
-			return time.Time{}, err
-		}
+	if len(parts) < 2 || len(parts) > 3 {
+		return time.Time{}, fmt.Errorf("sai định dạng HH:MM")
 	}
+
+	// Sửa lỗi: Khai báo và check lỗi đàng hoàng
+	h, err := strconv.Atoi(parts[0])
+	if err != nil {
+		return time.Time{}, err
+	}
+
+	m, err := strconv.Atoi(parts[1])
+	if err != nil {
+		return time.Time{}, err
+	}
+
+	s := 0
 	if len(parts) == 3 {
 		s, err = strconv.Atoi(parts[2])
 		if err != nil {
 			return time.Time{}, err
 		}
 	}
-	if len(parts) < 2 || len(parts) > 3 {
-		return time.Time{}, fmt.Errorf("sai định dạng HH:MM")
-	}
+
 	return time.Date(now.Year(), now.Month(), now.Day(), h, m, s, 0, now.Location()), nil
 }
 

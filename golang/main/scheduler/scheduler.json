@@ -8,6 +8,13 @@
           "task_cron": "increment_counter",
           "interval_seconds": 10,
           "status_cron": true
+        },
+        {
+          "name_cron": "Counter chạy 1.5s/lần",
+          "task_cron": "increment_counter",
+          "interval_seconds": 1.5,
+          "status_cron": true,
+          "at_time_cron": "18:25"
         }
       ]
     },
@@ -15,17 +22,11 @@
       "name_category": "Network Tasks",
       "services_cron": [
         {
-          "name_cron": "Ping Google 1.5 ngày/lần",
-          "task_cron": "ping_google",
+          "name_cron": "Ping Google (Link trong JSON)",
+          "task_cron": "ping_url", 
+          "url_cron": "https://www.google.com",
           "interval_seconds": 129600,
           "status_cron": true
-        },
-        {
-          "name_cron": "Săn Sale (Bắt đầu 18:25)",
-          "task_cron": "ping_google",
-          "interval_seconds": 1.5,
-          "status_cron": true,
-          "at_time_cron": "18:25"
         }
       ]
     }
