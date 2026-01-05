@@ -1,4 +1,5 @@
 golang/main/database/config_1.json
+golang/main/scheduler/*.txt
 *.log
 *.pid
 *.pyc
