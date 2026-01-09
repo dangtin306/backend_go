@@ -4,15 +4,15 @@
       "name_category": "System Tasks",
       "services_cron": [
         {
-          "name_cron": "Counter chạy 10s/lần",
+          "name_cron": "Counter chạy 1000s/lần",
           "task_cron": "increment_counter",
-          "interval_seconds": 10,
+          "interval_seconds": 1000,
           "status_cron": true
         },
         {
-          "name_cron": "Counter chạy 1.5s/lần",
+          "name_cron": "Counter chạy 15.5s/lần",
           "task_cron": "increment_counter",
-          "interval_seconds": 1.5,
+          "interval_seconds": 15.5,
           "status_cron": true,
           "at_time_cron": "18:25"
         }
