@@ -29,6 +29,29 @@
           "status_cron": true
         }
       ]
+    },
+    
+    {
+
+      "name_category": "tets",
+
+      "services_cron": [
+
+        {
+
+          "name_cron": "test",
+
+          "task_cron": "test",
+
+          "url_cron": "https://api.ipify.org?format=json",
+
+          "interval_seconds": 5,
+
+          "status_cron": true
+
+        }
+      ]
     }
+
   ]
 }
