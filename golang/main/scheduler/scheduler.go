@@ -130,38 +130,70 @@ func StartCounter() error {
 }
 
 // --- LOGIC TASK ---
-
 func taskFor(taskType string, fullName string, url string) (func(), error) {
-	switch taskType {
-	case "increment_counter":
+
+	// 1. Kiểm tra các task Logic Đặc Biệt (không dùng URL hoặc logic nội bộ)
+	if taskType == "increment_counter" {
 		return func() { incrementCounter(fullName) }, nil
-
-	case "ping_url": // Task dùng link từ JSON
-		return func() { pingUrl(fullName, url) }, nil
-
-	case "ping_google": // Task cũ (giữ lại cho tương thích)
-		return func() { pingUrl(fullName, "https://www.google.com") }, nil
-
-	default:
-		return nil, fmt.Errorf("unknown task: %q", taskType)
 	}
+
+	// 2. LOGIC TỰ ĐỘNG:
+	// Nếu có URL -> Tự động hiểu là task Ping URL.
+	// Bất kể tên task là "cc_test", "ping_google", "check_ip"... đều chạy tuốt.
+	if url != "" {
+		return func() { executeUrlTask(fullName, taskType, url) }, nil
+	}
+
+	// 3. Nếu không có URL mà tên task lạ hoắc -> Lỗi
+	return nil, fmt.Errorf("task %q lạ quá (không có URL để chạy)", taskType)
 }
 
-func pingUrl(fullName string, url string) {
-	if url == "" {
-		log.Printf("[%s] ❌ Lỗi: Chưa điền url_cron trong JSON!", fullName)
-		return
-	}
-
+// Hàm chạy URL tổng quát (Đổi tên từ pingUrl thành executeUrlTask cho chuẩn)
+func executeUrlTask(fullName string, taskType string, url string) {
 	client := http.Client{Timeout: 10 * time.Second}
 	resp, err := client.Get(url)
+
 	if err != nil {
-		log.Printf("[%s] ❌ Ping [%s] Fail: %v", fullName, url, err)
+		log.Printf("[%s] [%s] ❌ Fail: %v", fullName, taskType, err)
 		return
 	}
 	defer resp.Body.Close()
-	log.Printf("[%s] ✅ Ping [%s] -> Status: %s", fullName, url, resp.Status)
+
+	// In ra cả tên loại task (taskType) để bạn biết nó đang chạy kiểu gì
+	log.Printf("[%s] [%s] ✅ Status: %s (Link: %s)", fullName, taskType, resp.Status, url)
 }
+
+// func taskFor(taskType string, fullName string, url string) (func(), error) {
+// 	switch taskType {
+// 	case "increment_counter":
+// 		return func() { incrementCounter(fullName) }, nil
+
+// 	case "ping_url": // Task dùng link từ JSON
+// 		return func() { pingUrl(fullName, url) }, nil
+
+// 	case "ping_google": // Task cũ (giữ lại cho tương thích)
+// 		return func() { pingUrl(fullName, "https://www.google.com") }, nil
+
+// 	default:
+// 		return nil, fmt.Errorf("unknown task: %q", taskType)
+// 	}
+// }
+
+// func pingUrl(fullName string, url string) {
+// 	if url == "" {
+// 		log.Printf("[%s] ❌ Lỗi: Chưa điền url_cron trong JSON!", fullName)
+// 		return
+// 	}
+
+// 	client := http.Client{Timeout: 10 * time.Second}
+// 	resp, err := client.Get(url)
+// 	if err != nil {
+// 		log.Printf("[%s] ❌ Ping [%s] Fail: %v", fullName, url, err)
+// 		return
+// 	}
+// 	defer resp.Body.Close()
+// 	log.Printf("[%s] ✅ Ping [%s] -> Status: %s", fullName, url, resp.Status)
+// }
 
 func incrementCounter(fullName string) {
 	counterMu.Lock()

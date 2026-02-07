@@ -57,9 +57,13 @@ func ChecklinkHandler(c *gin.Context) {
 	}
 
 	dataTime := loadDataTime()
+	workerViews := loadWorkerViews(id_users)
 	results := make([]map[string]any, 0, len(rows))
 	for _, row := range rows {
 		mergePartnerInfo(row)
+		if shouldHideByWorker(row["id"], row["mission_quantity"], workerViews) {
+			continue
+		}
 		api_category := row["api_category"]
 		minorder := row["minorder"]
 		maxorder := row["maxorder"]
@@ -117,15 +121,18 @@ func buildItem(row map[string]string, category string, views int, timeDelay any,
 	if dataTime == nil {
 		dataTime = false
 	}
+	name := parseMaybeJSON(row["mission_name"])
+	description := parseMaybeJSON(row["mission_note"])
 	if category == "offerwall" {
 		return map[string]any{
 			"id":          row["id"],
 			"stt":         row["stt"],
-			"name":        row["mission_name"],
+			"name":        name,
 			"level":       row["level"],
-			"description": row["mission_note"],
+			"description": description,
 			"price":       row["money"],
 			"limit":       row["servicecode"],
+			"mission_quantity": row["mission_quantity"],
 			"maxorder":    row["maxorder"],
 			"type_api":    row["type_api"],
 			"data_time":   dataTime,
@@ -139,12 +146,13 @@ func buildItem(row map[string]string, category string, views int, timeDelay any,
 		return map[string]any{
 			"id":               row["id"],
 			"stt":              row["stt"],
-			"name":             row["mission_name"],
+			"name":             name,
 			"level":            row["level"],
 			"time_delay":       timeDelay,
-			"description":      row["mission_note"],
+			"description":      description,
 			"price":            row["money"],
 			"limit":            row["servicecode"],
+			"mission_quantity": row["mission_quantity"],
 			"maxorder":         row["maxorder"],
 			"type_api":         row["type_api"],
 			"api_category":     row["api_category"],
@@ -158,12 +166,13 @@ func buildItem(row map[string]string, category string, views int, timeDelay any,
 	return map[string]any{
 		"id":               row["id"],
 		"stt":              row["stt"],
-		"name":             row["mission_name"],
+		"name":             name,
 		"level":            row["level"],
 		"time_delay":       timeDelay,
-		"description":      row["mission_note"],
+		"description":      description,
 		"price":            row["money"],
 		"limit":            row["servicecode"],
+		"mission_quantity": row["mission_quantity"],
 		"maxorder":         row["maxorder"],
 		"type_api":         row["type_api"],
 		"api_categorymini": row["api_categorymini"],
@@ -174,6 +183,58 @@ func buildItem(row map[string]string, category string, views int, timeDelay any,
 	}
 }
 
+func parseMaybeJSON(value string) any {
+	trimmed := strings.TrimSpace(value)
+	if trimmed == "" {
+		return value
+	}
+	if trimmed[0] != '{' && trimmed[0] != '[' {
+		return value
+	}
+	var decoded any
+	if err := json.Unmarshal([]byte(trimmed), &decoded); err != nil {
+		return value
+	}
+	return decoded
+}
+
+func loadWorkerViews(id_users string) map[string]int {
+	id_users = strings.TrimSpace(id_users)
+	if id_users == "" {
+		return map[string]int{}
+	}
+	rows, err := queryRows("SELECT `id_misson_main`, `views_worker` FROM `mission_partner_worker` WHERE `id_users` = '" + id_users + "' ")
+	if err != nil {
+		return map[string]int{}
+	}
+	views := make(map[string]int, len(rows))
+	for _, row := range rows {
+		missionID := row["id_misson_main"]
+		if missionID == "" {
+			continue
+		}
+		value := toInt(row["views_worker"])
+		if current, ok := views[missionID]; !ok || value > current {
+			views[missionID] = value
+		}
+	}
+	return views
+}
+
+func shouldHideByWorker(missionID, missionQuantity string, workerViews map[string]int) bool {
+	if missionID == "" || len(workerViews) == 0 {
+		return false
+	}
+	qty := toInt(missionQuantity)
+	if qty <= 0 {
+		return false
+	}
+	views, ok := workerViews[missionID]
+	if !ok {
+		return false
+	}
+	return views >= qty
+}
 func shouldSkipLevel(level_users, level_mission string) bool {
 	if level_users == "" || level_mission == "" {
 		return false

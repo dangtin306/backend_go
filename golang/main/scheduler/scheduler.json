@@ -23,9 +23,52 @@
       "services_cron": [
         {
           "name_cron": "Ping Google (Link trong JSON)",
-          "task_cron": "ping_url", 
+          "task_cron": "ping_url",
           "url_cron": "https://www.google.com",
           "interval_seconds": 129600,
+          "status_cron": true
+        }
+      ]
+    },
+    {
+      "name_category": "database",
+      "services_cron": [
+        {
+          "name_cron": "Lưu data cho go",
+          "task_cron": "go_full_database",
+          "url_cron": "https://nginx.hust.media/go/database/export_data",
+          "interval_seconds": 20000,
+          "status_cron": true
+        },
+        {
+          "name_cron": "Lưu data cho php",
+          "task_cron": "php_full_database",
+          "url_cron": "http://localhost:8080/api/sql/export_data.php",
+          "interval_seconds": 20000,
+          "status_cron": true
+        }
+      ]
+    },
+    {
+      "name_category": "Checkscam",
+      "services_cron": [
+        {
+          "name_cron": "duyệt bài viết",
+          "task_cron": "accept_main_ok",
+          "url_cron": "http://localhost:8080/api/scams_check/process/accept_main.php",
+          "interval_seconds": 2000,
+          "status_cron": true
+        }
+      ]
+    },
+    {
+      "name_category": "p2p_mmo_accounts",
+      "services_cron": [
+        {
+          "name_cron": "duyệt đơn hàng",
+          "task_cron": "accept_main_ok",
+          "url_cron": "http://localhost:8080/api/orders/account/sellers/services/sold/orders_sale_main.php",
+          "interval_seconds": 2500,
           "status_cron": true
         }
       ]
