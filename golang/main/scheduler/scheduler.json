@@ -30,6 +30,7 @@
         }
       ]
     },
+<<<<<<< HEAD
     {
       "name_category": "database",
       "services_cron": [
@@ -70,8 +71,30 @@
           "url_cron": "http://localhost:8080/api/orders/account/sellers/services/sold/orders_sale_main.php",
           "interval_seconds": 2500,
           "status_cron": true
+=======
+    
+    {
+
+      "name_category": "tets",
+
+      "services_cron": [
+
+        {
+
+          "name_cron": "test",
+
+          "task_cron": "test",
+
+          "url_cron": "https://api.ipify.org?format=json",
+
+          "interval_seconds": 5,
+
+          "status_cron": true
+
+>>>>>>> ec076bb50aa7ccb19c3fbad97581d594cfb8bcf7
         }
       ]
     }
+
   ]
 }
