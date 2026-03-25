@@ -1,100 +1,161 @@
-{
+﻿{
   "categories_cron": [
     {
-      "name_category": "System Tasks",
+      "category_name": "tác vụ hệ thống",
+      "category_key": "system_tasks",
       "services_cron": [
         {
           "name_cron": "Counter chạy 1000s/lần",
-          "task_cron": "increment_counter",
+          "task_cron": "increment_counter_1",
           "interval_seconds": 1000,
-          "status_cron": true
+          "status_cron": true,
+          "cron_tyoe": "internal"
         },
         {
           "name_cron": "Counter chạy 15.5s/lần",
-          "task_cron": "increment_counter",
+          "task_cron": "increment_counter_2",
           "interval_seconds": 15.5,
           "status_cron": true,
-          "at_time_cron": "18:25"
+          "at_time_cron": "18:25",
+          "cron_tyoe": "internal"
+        },
+        {
+          "name_cron": "Run PowerShell Test",
+          "task_cron": "run_powershell_test",
+          "command_cron": "Write-Output 'scheduler test'",
+          "interval_seconds": 60,
+          "status_cron": false,
+          "cron_show": false,
+          "cron_timeout_seconds": 30,
+          "cron_tyoe": "powershell",
+          "cron_single": true
+        },
+        {
+          "name_cron": "Check OpenClaw",
+          "task_cron": "check_openclaw",
+          "command_cron": "Set-Location 'C:\\hustmedia6'; python 'backend\\golang\\service\\openclaw\\check_openclaw.py'",
+          "interval_seconds": 535,
+          "status_cron": true,
+          "run_on_start_cron": true,
+          "cron_show": false,
+          "cron_timeout_seconds": 30,
+          "cron_tyoe": "powershell",
+          "cron_single": true
+        },
+        {
+          "name_cron": "Check Next.js",
+          "task_cron": "check_next_js",
+          "command_cron": "python D:\\hustmedia\\python\\server\\fontend\\check_next_js.py",
+          "interval_seconds": 367,
+          "status_cron": true,
+          "cron_show": false,
+          "cron_timeout_seconds": 30,
+          "cron_tyoe": "powershell",
+          "cron_single": true
         }
       ]
     },
     {
-      "name_category": "Network Tasks",
+      "category_name": "tác vụ mạng",
+      "category_key": "network_tasks",
       "services_cron": [
         {
           "name_cron": "Ping Google (Link trong JSON)",
           "task_cron": "ping_url",
           "url_cron": "https://www.google.com",
           "interval_seconds": 129600,
-          "status_cron": true
+          "status_cron": true,
+          "cron_tyoe": "api_get"
         }
       ]
     },
-<<<<<<< HEAD
     {
-      "name_category": "database",
+      "category_name": "cơ sở dữ liệu",
+      "category_key": "database",
       "services_cron": [
         {
           "name_cron": "Lưu data cho go",
           "task_cron": "go_full_database",
           "url_cron": "https://nginx.hust.media/go/database/export_data",
           "interval_seconds": 20000,
-          "status_cron": true
+          "status_cron": true,
+          "cron_tyoe": "api_get"
         },
         {
           "name_cron": "Lưu data cho php",
           "task_cron": "php_full_database",
           "url_cron": "http://localhost:8080/api/sql/export_data.php",
           "interval_seconds": 20000,
-          "status_cron": true
+          "status_cron": true,
+          "cron_tyoe": "api_get"
         }
       ]
     },
     {
-      "name_category": "Checkscam",
+      "category_name": "kiểm duyệt scam",
+      "category_key": "Checkscam",
       "services_cron": [
         {
           "name_cron": "duyệt bài viết",
           "task_cron": "accept_main_ok",
           "url_cron": "http://localhost:8080/api/scams_check/process/accept_main.php",
           "interval_seconds": 2000,
-          "status_cron": true
+          "status_cron": true,
+          "cron_tyoe": "api_get"
         }
       ]
     },
     {
-      "name_category": "p2p_mmo_accounts",
+      "category_name": "trao đổi mmo",
+      "category_key": "p2p_mmo",
       "services_cron": [
         {
           "name_cron": "duyệt đơn hàng",
           "task_cron": "accept_main_ok",
           "url_cron": "http://localhost:8080/api/orders/account/sellers/services/sold/orders_sale_main.php",
           "interval_seconds": 2500,
-          "status_cron": true
-=======
-    
+          "status_cron": true,
+          "cron_tyoe": "api_get"
+        }
+      ]
+    },
     {
-
-      "name_category": "tets",
-
+      "category_name": "dịch vụ",
+      "category_key": "services",
       "services_cron": [
-
         {
-
-          "name_cron": "test",
-
-          "task_cron": "test",
-
-          "url_cron": "https://api.ipify.org?format=json",
-
-          "interval_seconds": 5,
-
-          "status_cron": true
-
->>>>>>> ec076bb50aa7ccb19c3fbad97581d594cfb8bcf7
+          "name_cron": "cập nhật money",
+          "task_cron": "money_update",
+          "url_cron": "https://nginx.hust.media/go/service/money_update",
+          "interval_seconds": 2880,
+          "status_cron": true,
+          "cron_tyoe": "api_get"
+        },
+        {
+          "name_cron": "services auto alias",
+          "task_cron": "services_auto_alias",
+          "url_cron": "https://hust.media/api/orders/account/cron/services_auto_alias.php",
+          "interval_seconds": 480,
+          "status_cron": true,
+          "cron_tyoe": "api_get"
+        },
+        {
+          "name_cron": "services auto category",
+          "task_cron": "services_auto_category",
+          "url_cron": "https://hust.media/api/orders/account/cron/services_auto_category.php",
+          "interval_seconds": 480,
+          "status_cron": true,
+          "cron_tyoe": "api_get"
+        },
+        {
+          "name_cron": "services auto me",
+          "task_cron": "services_auto_me",
+          "url_cron": "https://hust.media/api/orders/account/cron/services_auto_me.php",
+          "interval_seconds": 64800,
+          "status_cron": true,
+          "cron_tyoe": "api_get"
         }
       ]
     }
-
   ]
 }

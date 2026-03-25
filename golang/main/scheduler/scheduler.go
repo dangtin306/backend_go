@@ -1,11 +1,14 @@
 package scheduler
 
 import (
+	"bytes"
+	"context"
 	"encoding/json"
 	"fmt"
 	"log"
 	"net/http"
 	"os"
+	"os/exec"
 	"path/filepath"
 	"runtime"
 	"strconv"
@@ -21,6 +24,7 @@ const configFileName = "scheduler.json"
 
 var schedulerInstance gocron.Scheduler
 var counterMu sync.Mutex
+var jobRunState sync.Map
 
 // --- STRUCT ---
 
@@ -29,17 +33,78 @@ type schedulerConfig struct {
 }
 
 type categoryConfig struct {
-	Name     string      `json:"name_category"`
+	Key      string      `json:"category_key"`
 	Services []jobConfig `json:"services_cron"`
+}
+
+func (c *categoryConfig) UnmarshalJSON(data []byte) error {
+	type rawCategoryConfig struct {
+		CategoryKey   string      `json:"category_key"`
+		CategoryValue string      `json:"category_value"`
+		Services      []jobConfig `json:"services_cron"`
+	}
+
+	var raw rawCategoryConfig
+	if err := json.Unmarshal(data, &raw); err != nil {
+		return err
+	}
+
+	c.Key = firstNonEmpty(raw.CategoryKey, raw.CategoryValue)
+	c.Services = raw.Services
+	return nil
 }
 
 type jobConfig struct {
 	Name            string  `json:"name_cron"`
 	Task            string  `json:"task_cron"`
+	Type            string  `json:"cron_tyoe"`
 	IntervalSeconds float64 `json:"interval_seconds"`
 	Status          bool    `json:"status_cron"`
+	CronShow        bool    `json:"cron_show"`
+	CronSingleton   bool    `json:"cron_single"`
+	RunOnStart      bool    `json:"run_on_start_cron"`
+	TimeoutSeconds  int     `json:"cron_timeout_seconds"`
 	AtTime          string  `json:"at_time_cron"`
-	Url             string  `json:"url_cron"` // [MỚI] Link cần ping
+	Command         string  `json:"command_cron"`
+	Url             string  `json:"url_cron"` // [M?I] Link c?n ping
+}
+
+func (j *jobConfig) UnmarshalJSON(data []byte) error {
+	type rawJobConfig struct {
+		Name            string  `json:"name_cron"`
+		Task            string  `json:"task_cron"`
+		CronType        string  `json:"cron_tyoe"`
+		LegacyType      string  `json:"type_cron"`
+		IntervalSeconds float64 `json:"interval_seconds"`
+		Status          bool    `json:"status_cron"`
+		CronShow        bool    `json:"cron_show"`
+		CronSingle      bool    `json:"cron_single"`
+		LegacySingleton bool    `json:"cron_singleton"`
+		RunOnStart      bool    `json:"run_on_start_cron"`
+		TimeoutSeconds  int     `json:"cron_timeout_seconds"`
+		AtTime          string  `json:"at_time_cron"`
+		Command         string  `json:"command_cron"`
+		URL             string  `json:"url_cron"`
+	}
+
+	var raw rawJobConfig
+	if err := json.Unmarshal(data, &raw); err != nil {
+		return err
+	}
+
+	j.Name = raw.Name
+	j.Task = raw.Task
+	j.Type = firstNonEmpty(raw.CronType, raw.LegacyType)
+	j.IntervalSeconds = raw.IntervalSeconds
+	j.Status = raw.Status
+	j.CronShow = raw.CronShow
+	j.CronSingleton = raw.CronSingle || raw.LegacySingleton
+	j.RunOnStart = raw.RunOnStart
+	j.TimeoutSeconds = raw.TimeoutSeconds
+	j.AtTime = raw.AtTime
+	j.Command = raw.Command
+	j.Url = raw.URL
+	return nil
 }
 
 // -----------------------------------------------------
@@ -68,7 +133,7 @@ func StartCounter() error {
 
 	for _, category := range config.Categories {
 		for _, job := range category.Services {
-			fullName := fmt.Sprintf("%s > %s", category.Name, job.Name)
+			fullName := fmt.Sprintf("%s > %s", category.Key, job.Name)
 
 			if !job.Status {
 				log.Printf("⚠️  [%s] OFF -> Skip", fullName)
@@ -85,14 +150,18 @@ func StartCounter() error {
 				taskName = "increment_counter"
 			}
 
-			// Truyền Url vào hàm taskFor
-			task, err := taskFor(taskName, fullName, job.Url)
+			// Truyền Url/Command vào hàm taskFor
+			task, err := taskFor(job.Type, taskName, fullName, job.Url, job.Command, job.CronShow, job.CronSingleton, job.TimeoutSeconds)
 			if err != nil {
 				return err
 			}
 
 			options := []gocron.JobOption{
 				gocron.WithName(fullName),
+			}
+
+			if job.RunOnStart {
+				options = append(options, gocron.WithStartAt(gocron.WithStartImmediately()))
 			}
 
 			if job.AtTime != "" {
@@ -130,27 +199,62 @@ func StartCounter() error {
 }
 
 // --- LOGIC TASK ---
-func taskFor(taskType string, fullName string, url string) (func(), error) {
+func taskFor(jobType string, taskType string, fullName string, url string, command string, cronShow bool, cronSingleton bool, timeoutSeconds int) (func(), error) {
+	normalizedType := strings.ToLower(strings.TrimSpace(jobType))
+	commandToRun := strings.TrimSpace(command)
+	urlToRun := strings.TrimSpace(url)
 
-	// 1. Kiểm tra các task Logic Đặc Biệt (không dùng URL hoặc logic nội bộ)
-	if taskType == "increment_counter" {
-		return func() { incrementCounter(fullName) }, nil
+	if normalizedType == "" {
+		switch {
+		case commandToRun != "":
+			normalizedType = "powershell"
+		case urlToRun != "":
+			normalizedType = "api_get"
+		case taskType == "increment_counter" || strings.HasPrefix(taskType, "increment_counter_"):
+			normalizedType = "internal"
+		}
 	}
 
-	// 2. LOGIC TỰ ĐỘNG:
-	// Nếu có URL -> Tự động hiểu là task Ping URL.
-	// Bất kể tên task là "cc_test", "ping_google", "check_ip"... đều chạy tuốt.
-	if url != "" {
-		return func() { executeUrlTask(fullName, taskType, url) }, nil
+	switch normalizedType {
+	case "internal":
+		switch {
+		case taskType == "increment_counter" || strings.HasPrefix(taskType, "increment_counter_"):
+			return wrapJobExecution(fullName, normalizedType, cronSingleton, func() { incrementCounter(fullName) }), nil
+		default:
+			return nil, fmt.Errorf("task internal %q chua duoc ho tro", taskType)
+		}
+	case "powershell":
+		if commandToRun == "" {
+			return nil, fmt.Errorf("task powershell %q thieu command_cron", taskType)
+		}
+		return wrapJobExecution(fullName, normalizedType, cronSingleton, func() { executePowerShellTask(fullName, taskType, commandToRun, cronShow, timeoutSeconds) }), nil
+	case "api_get":
+		if urlToRun == "" {
+			return nil, fmt.Errorf("task api_get %q thieu url_cron", taskType)
+		}
+		return wrapJobExecution(fullName, normalizedType, cronSingleton, func() { executeUrlTask(fullName, taskType, urlToRun, timeoutSeconds) }), nil
+	default:
+		return nil, fmt.Errorf("cron_tyoe %q khong hop le cho task %q", normalizedType, taskType)
 	}
-
-	// 3. Nếu không có URL mà tên task lạ hoắc -> Lỗi
-	return nil, fmt.Errorf("task %q lạ quá (không có URL để chạy)", taskType)
 }
 
 // Hàm chạy URL tổng quát (Đổi tên từ pingUrl thành executeUrlTask cho chuẩn)
-func executeUrlTask(fullName string, taskType string, url string) {
-	client := http.Client{Timeout: 10 * time.Second}
+func wrapJobExecution(fullName string, jobType string, cronSingleton bool, runner func()) func() {
+	return func() {
+		if cronSingleton {
+			if _, loaded := jobRunState.LoadOrStore(fullName, true); loaded {
+				log.Printf("[%s] [%s] Skip: previous run still active (cron_single=true)", fullName, jobType)
+				return
+			}
+			defer jobRunState.Delete(fullName)
+		}
+
+		runner()
+	}
+}
+
+func executeUrlTask(fullName string, taskType string, url string, timeoutSeconds int) {
+	client := http.Client{Timeout: durationFromSeconds(timeoutSeconds, 10*time.Second)}
 	resp, err := client.Get(url)
 
 	if err != nil {
@@ -161,6 +265,59 @@ func executeUrlTask(fullName string, taskType string, url string) {
 
 	// In ra cả tên loại task (taskType) để bạn biết nó đang chạy kiểu gì
 	log.Printf("[%s] [%s] ✅ Status: %s (Link: %s)", fullName, taskType, resp.Status, url)
+}
+
+func executePowerShellTask(fullName string, taskType string, command string, cronShow bool, timeoutSeconds int) {
+	command = strings.TrimSpace(command)
+	if command == "" {
+		log.Printf("[%s] [%s] PowerShell skip: command_cron empty", fullName, taskType)
+		return
+	}
+
+	if runtime.GOOS == "windows" {
+		if cronShow {
+			psCommand := fmt.Sprintf("$ErrorActionPreference='Stop'; try { %s } finally { Start-Sleep -Seconds 3 }", command)
+			cmd := exec.Command(
+				"cmd", "/C", "start", "",
+				"powershell.exe", "-NoProfile", "-ExecutionPolicy", "Bypass", "-Command", psCommand,
+			)
+			output, err := cmd.CombinedOutput()
+			result := strings.TrimSpace(string(output))
+			if err != nil {
+				log.Printf("[%s] [%s] PowerShell launch fail: %v | Output: %s", fullName, taskType, err, result)
+				return
+			}
+			log.Printf("[%s] [%s] Opened PowerShell window (auto close after 3s)", fullName, taskType)
+			return
+		}
+	}
+
+	timeout := durationFromSeconds(timeoutSeconds, 30*time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), timeout)
+	defer cancel()
+
+	cmd := exec.CommandContext(ctx, "powershell", "-NoProfile", "-NonInteractive", "-Command", command)
+	output, err := cmd.CombinedOutput()
+	result := strings.TrimSpace(string(output))
+
+	if ctx.Err() == context.DeadlineExceeded {
+		log.Printf("[%s] [%s] PowerShell timeout after %s | Command: %s", fullName, taskType, timeout, command)
+		return
+	}
+
+	if err != nil {
+		log.Printf("[%s] [%s] PowerShell fail: %v | Output: %s", fullName, taskType, err, result)
+		return
+	}
+
+	log.Printf("[%s] [%s] PowerShell output: %s", fullName, taskType, result)
+}
+
+func durationFromSeconds(timeoutSeconds int, fallback time.Duration) time.Duration {
+	if timeoutSeconds <= 0 {
+		return fallback
+	}
+	return time.Duration(timeoutSeconds) * time.Second
 }
 
 // func taskFor(taskType string, fullName string, url string) (func(), error) {
@@ -236,14 +393,27 @@ func parseTimeToday(timeStr string) (time.Time, error) {
 	return time.Date(now.Year(), now.Month(), now.Day(), h, m, s, 0, now.Location()), nil
 }
 
+func firstNonEmpty(values ...string) string {
+	for _, value := range values {
+		if strings.TrimSpace(value) != "" {
+			return value
+		}
+	}
+	return ""
+}
+
 func loadConfig() (schedulerConfig, error) {
 	data, err := os.ReadFile(configPath())
 	if err != nil {
 		return schedulerConfig{}, err
 	}
+
+	// Support UTF-8 BOM files saved by some Windows editors.
+	data = bytes.TrimPrefix(data, []byte{0xEF, 0xBB, 0xBF})
+
 	var config schedulerConfig
 	if err := json.Unmarshal(data, &config); err != nil {
-		return schedulerConfig{}, err
+		return schedulerConfig{}, fmt.Errorf("parse %s: %w", configPath(), err)
 	}
 	return config, nil
 }

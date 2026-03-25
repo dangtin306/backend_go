@@ -63,11 +63,16 @@ def stop_existing_main_instances():
     escaped = script_path.replace("'", "''")
     cmd = (
         "Get-CimInstance Win32_Process | "
-        "Where-Object { $_.CommandLine -like '*"
-        + escaped
-        + "*' -and $_.ProcessId -ne "
+        "Where-Object { "
+        "$_.Name -eq 'python.exe' -and "
+        "$_.ProcessId -ne "
         + str(current_pid)
-        + " } | Select-Object -ExpandProperty ProcessId"
+        + " -and ("
+        "$_.CommandLine -like '*"
+        + escaped
+        + "*' -or "
+        "$_.CommandLine -match '(?i)backend\\\\server\\\\main\\.py'"
+        ") } | Select-Object -ExpandProperty ProcessId"
     )
     try:
         output = subprocess.check_output(
@@ -81,7 +86,20 @@ def stop_existing_main_instances():
     for pid in pids:
         _kill_pid(pid)
     if pids:
+        _wait_for_pids_exit([int(pid) for pid in pids if pid.isdigit()], timeout_seconds=10)
+    if pids:
         print(f"Stopped other main.py instances: {', '.join(pids)}")
+
+
+def _wait_for_pids_exit(pids, timeout_seconds=10):
+    deadline = time.time() + timeout_seconds
+    remaining = set(pid for pid in pids if pid > 0)
+    while remaining and time.time() < deadline:
+        remaining = {pid for pid in remaining if is_process_running(pid)}
+        if not remaining:
+            return True
+        time.sleep(0.2)
+    return not remaining
 
 
 def stop_telegram_listener():

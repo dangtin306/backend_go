@@ -8,6 +8,7 @@ from pathlib import Path
 BASE_DIR = Path(__file__).resolve().parents[1] / "golang"
 LOG_DIR = Path(__file__).resolve().parent / "logs"
 PID_FILE = LOG_DIR / "golang.pid"
+WATCH_EXE = LOG_DIR / "golang-watch.exe"
 APP_PORT = int(os.environ.get("GOLANG_PORT", "8795"))
 
 # Optional overrides:
@@ -108,6 +109,7 @@ def start_golang(show_logs=False, wait=False, watch=False):
 def stop_golang():
     killed = set()
     killed.update(_stop_by_port(APP_PORT))
+    killed.update(_stop_golang_supervisors())
 
     existing_pid = 0
     if PID_FILE.exists():
@@ -121,6 +123,8 @@ def stop_golang():
 
     if PID_FILE.exists():
         PID_FILE.unlink(missing_ok=True)
+
+    _wait_for_golang_shutdown(timeout_seconds=10)
 
     if killed:
         pid_list = ", ".join(sorted(str(pid) for pid in killed))
@@ -223,7 +227,121 @@ def _pid_listening_on_port(pid, port):
         return False
 
 
-def _scan_go_files(root_dir):
+def _stop_golang_supervisors():
+    if not sys.platform.startswith("win"):
+        return set()
+
+    pids = set()
+    commands = [
+        (
+            "Get-CimInstance Win32_Process | "
+            "Where-Object { $_.Name -eq 'golang-watch.exe' } | "
+            "Select-Object -ExpandProperty ProcessId"
+        ),
+        (
+            "Get-CimInstance Win32_Process | "
+            "Where-Object { $_.CommandLine -like '*backend\\\\server\\\\golang.py*' } | "
+            "Select-Object -ExpandProperty ProcessId"
+        ),
+    ]
+
+    for cmd in commands:
+        try:
+            output = subprocess.check_output(
+                ["powershell", "-NoProfile", "-Command", cmd],
+                text=True,
+                encoding="utf-8",
+            )
+        except subprocess.CalledProcessError:
+            continue
+
+        for line in output.splitlines():
+            line = line.strip()
+            if line.isdigit():
+                pids.add(int(line))
+
+    for pid in pids:
+        _kill_pid(pid)
+
+    return pids
+
+
+def _wait_for_golang_shutdown(timeout_seconds=10):
+    deadline = time.time() + timeout_seconds
+    while time.time() < deadline:
+        watchers = _list_golang_supervisor_pids()
+        listening = _listening_pids_on_port(APP_PORT)
+        if not watchers and not listening:
+            return True
+        time.sleep(0.2)
+    return False
+
+
+def _list_golang_supervisor_pids():
+    if not sys.platform.startswith("win"):
+        return set()
+
+    pids = set()
+    commands = [
+        (
+            "Get-CimInstance Win32_Process | "
+            "Where-Object { $_.Name -eq 'golang-watch.exe' } | "
+            "Select-Object -ExpandProperty ProcessId"
+        ),
+        (
+            "Get-CimInstance Win32_Process | "
+            "Where-Object { $_.CommandLine -like '*backend\\\\server\\\\golang.py*' } | "
+            "Select-Object -ExpandProperty ProcessId"
+        ),
+    ]
+    for cmd in commands:
+        try:
+            output = subprocess.check_output(
+                ["powershell", "-NoProfile", "-Command", cmd],
+                text=True,
+                encoding="utf-8",
+            )
+        except subprocess.CalledProcessError:
+            continue
+        for line in output.splitlines():
+            line = line.strip()
+            if line.isdigit():
+                pids.add(int(line))
+    return pids
+
+
+def _listening_pids_on_port(port):
+    if not sys.platform.startswith("win"):
+        return set()
+    pids = set()
+    try:
+        output = subprocess.check_output(
+            [
+                "powershell",
+                "-NoProfile",
+                "-Command",
+                (
+                    "Get-NetTCPConnection -LocalPort "
+                    + str(port)
+                    + " -State Listen | Select-Object -ExpandProperty OwningProcess"
+                ),
+            ],
+            text=True,
+            encoding="utf-8",
+        )
+        for line in output.splitlines():
+            line = line.strip()
+            if line.isdigit():
+                pids.add(int(line))
+    except subprocess.CalledProcessError:
+        return set()
+    return pids
+
+
+WATCH_EXTENSIONS = {".go", ".json"}
+
+
+def _scan_watch_files(root_dir):
     mtimes = {}
     for dirpath, dirnames, filenames in os.walk(root_dir):
         dirnames[:] = [
@@ -241,7 +359,7 @@ def _scan_go_files(root_dir):
             }
         ]
         for filename in filenames:
-            if not filename.endswith(".go"):
+            if Path(filename).suffix.lower() not in WATCH_EXTENSIONS:
                 continue
             path = os.path.join(dirpath, filename)
             try:
@@ -253,34 +371,60 @@ def _scan_go_files(root_dir):
 
 def _start_with_watch(cmd):
     poll_interval = float(os.environ.get("GOLANG_WATCH_INTERVAL", "1.0"))
-    snapshot = _scan_go_files(str(BASE_DIR))
+    snapshot = _scan_watch_files(str(BASE_DIR))
+
+    def build_watch_binary():
+        go_exe = resolve_go_exe()
+        result = subprocess.run(
+            [go_exe, "build", "-o", str(WATCH_EXE), "./main"],
+            cwd=str(BASE_DIR),
+            check=False,
+        )
+        if result.returncode != 0:
+            print("Failed to build golang watch binary.")
+            return False
+        return True
 
     def spawn():
-        proc = subprocess.Popen(cmd, cwd=str(BASE_DIR))
+        if sys.platform.startswith("win"):
+            _stop_by_port(APP_PORT)
+            if not build_watch_binary():
+                return None
+            proc = subprocess.Popen([str(WATCH_EXE)], cwd=str(BASE_DIR))
+        else:
+            proc = subprocess.Popen(cmd, cwd=str(BASE_DIR))
         PID_FILE.write_text(str(proc.pid), encoding="utf-8")
         print(f"Started golang (pid {proc.pid}).")
         return proc
 
     proc = spawn()
+    if proc is None:
+        return 1
     try:
         while True:
             time.sleep(poll_interval)
-            current = _scan_go_files(str(BASE_DIR))
+            current = _scan_watch_files(str(BASE_DIR))
             if current != snapshot:
-                print("Detected Go change, restarting...")
+                print("Detected Go/JSON change, restarting...")
                 _kill_pid(proc.pid)
+                _stop_by_port(APP_PORT)
                 try:
                     proc.wait(timeout=5)
                 except Exception:
                     pass
                 snapshot = current
                 proc = spawn()
+                if proc is None:
+                    continue
                 continue
             if proc.poll() is not None:
                 print("Golang process exited, restarting...")
                 proc = spawn()
+                if proc is None:
+                    continue
     except KeyboardInterrupt:
         _kill_pid(proc.pid)
+        _stop_by_port(APP_PORT)
         return 0
 
 
