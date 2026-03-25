@@ -19,6 +19,7 @@ const shopxulaohacProfileAPIURL = "https://shopxulaohac.vn/api/profile.php"
 const tuongtaccheoPanelAPIURL = "https://tuongtaccheo.com/api/v2"
 const traodoisubProfileAPIURL = "https://traodoisub.com/api/"
 const mfbPanelAPIURL = "https://api.mfb.vn/v2"
+const vipigLoginTokenAPIURL = "https://vipig.net/logintoken.php"
 
 // peakerr_money gets account balance from Peakerr using action=balance.
 func peakerr_money(apiKey string) (string, error) {
@@ -232,6 +233,52 @@ func traodoisub_money(keyFromApiURL string) (string, error) {
 // API key is taken from key_apikey column.
 func mfb_money(apiKey string) (string, error) {
 	return panel_money(mfbPanelAPIURL, apiKey)
+}
+
+// vipig_money gets account xu from VIPIG.
+// Token is read from apikey.api_url and sent as access_token.
+func vipig_money(keyFromApiURL string) (string, error) {
+	token := extractTokenValue(keyFromApiURL)
+	if token == "" {
+		return "", fmt.Errorf("vipig access_token missing in api_url")
+	}
+
+	form := url.Values{}
+	form.Set("access_token", strings.TrimSpace(token))
+
+	req, err := http.NewRequest(http.MethodPost, vipigLoginTokenAPIURL, strings.NewReader(form.Encode()))
+	if err != nil {
+		return "", err
+	}
+	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+
+	client := &http.Client{Timeout: 30 * time.Second}
+	resp, err := client.Do(req)
+	if err != nil {
+		return "", err
+	}
+	defer resp.Body.Close()
+
+	body, _ := io.ReadAll(resp.Body)
+	if resp.StatusCode >= http.StatusBadRequest {
+		return "", fmt.Errorf("vipig status %d: %s", resp.StatusCode, strings.TrimSpace(string(body)))
+	}
+
+	payload := map[string]any{}
+	if err := json.Unmarshal(body, &payload); err != nil {
+		return "", err
+	}
+
+	status := strings.ToLower(strings.TrimSpace(fmt.Sprint(payload["status"])))
+	if status != "" && status != "success" {
+		return "", fmt.Errorf("vipig status=%s", status)
+	}
+
+	money := extractMoneyField(payload)
+	if money == "" {
+		return "", fmt.Errorf("vipig sodu missing")
+	}
+	return money, nil
 }
 
 func extractTokenValue(raw string) string {

@@ -15,6 +15,7 @@ type moneyListItem struct {
 	ID            int64  `json:"id"`
 	Website       string `json:"website"`
 	KeyCheckMoney int64  `json:"key_check_money"`
+	APIURL        string `json:"api_url,omitempty"`
 	Money         string `json:"money"`
 	KeyMoneyOK    string `json:"key_money_ok,omitempty"`
 	CreateDate    string `json:"createdate"`
@@ -73,6 +74,11 @@ func MoneyListHandler(c *gin.Context) {
 		api.Print_json(c, "status", "0", "message", err.Error())
 		return
 	}
+	hasAPIURL, err := hasColumn(conn, "apikey", "api_url")
+	if err != nil {
+		api.Print_json(c, "status", "0", "message", err.Error())
+		return
+	}
 	hasKeyMoneyOK, err := hasColumn(conn, "apikey", "key_money_ok")
 	if err != nil {
 		api.Print_json(c, "status", "0", "message", err.Error())
@@ -88,6 +94,11 @@ func MoneyListHandler(c *gin.Context) {
 		"`id`",
 		"`website`",
 		"`key_check_money`",
+	}
+	if hasAPIURL {
+		selectCols = append(selectCols, "`api_url`")
+	} else {
+		selectCols = append(selectCols, "'' AS `api_url`")
 	}
 	if hasMoney {
 		selectCols = append(selectCols, "`money`")
@@ -119,11 +130,12 @@ func MoneyListHandler(c *gin.Context) {
 		var id sql.NullInt64
 		var website sql.NullString
 		var keyCheck sql.NullInt64
+		var apiURL sql.NullString
 		var money sql.NullString
 		var createDate sql.NullString
 		var keyMoneyOK sql.NullString
 
-		if err := rows.Scan(&id, &website, &keyCheck, &money, &createDate, &keyMoneyOK); err != nil {
+		if err := rows.Scan(&id, &website, &keyCheck, &apiURL, &money, &createDate, &keyMoneyOK); err != nil {
 			api.Print_json(c, "status", "0", "message", err.Error())
 			return
 		}
@@ -132,6 +144,7 @@ func MoneyListHandler(c *gin.Context) {
 			ID:            id.Int64,
 			Website:       website.String,
 			KeyCheckMoney: keyCheck.Int64,
+			APIURL:        apiURL.String,
 			Money:         money.String,
 			KeyMoneyOK:    keyMoneyOK.String,
 			CreateDate:    createDate.String,
@@ -147,6 +160,7 @@ func MoneyListHandler(c *gin.Context) {
 		"status", "1",
 		"message", "ok",
 		"count", len(list),
+		"has_api_url", hasAPIURL,
 		"has_money", hasMoney,
 		"has_key_money_ok", hasKeyMoneyOK,
 		"has_createdate", hasCreateDate,

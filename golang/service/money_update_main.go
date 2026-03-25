@@ -133,6 +133,7 @@ func UpdateMoneyHandler(c *gin.Context) {
 	mfbIDs := make([]int64, 0, len(ids))
 	tuongtaccheoIDs := make([]int64, 0, len(ids))
 	traodoisubIDs := make([]int64, 0, len(ids))
+	vipigIDs := make([]int64, 0, len(ids))
 	updatedIDs := make([]int64, 0, len(ids))
 	failed := make([]map[string]any, 0)
 	updatedColumns := map[string]int{}
@@ -175,13 +176,16 @@ func UpdateMoneyHandler(c *gin.Context) {
 		} else if strings.Contains(websiteLower, "traodoisub") {
 			panelType = "traodoisub"
 			traodoisubIDs = append(traodoisubIDs, id)
+		} else if strings.Contains(websiteLower, "vipig") {
+			panelType = "vipig"
+			vipigIDs = append(vipigIDs, id)
 		}
 		if panelType == "" {
 			continue
 		}
 
 		authValue := keyApikey
-		if panelType == "tuongtaccheo" || panelType == "traodoisub" {
+		if panelType == "tuongtaccheo" || panelType == "traodoisub" || panelType == "vipig" {
 			authValue = apiURL // per requirement: key is stored in api_url column
 			if strings.TrimSpace(extractTokenValue(authValue)) == "" && strings.TrimSpace(keyApikey) != "" {
 				// Fallback only when api_url does not contain a usable token.
@@ -214,6 +218,8 @@ func UpdateMoneyHandler(c *gin.Context) {
 			money, err = mfb_money(authValue)
 		} else if panelType == "tuongtaccheo" {
 			money, err = tuongtaccheo_money(authValue)
+		} else if panelType == "vipig" {
+			money, err = vipig_money(authValue)
 		} else {
 			money, err = traodoisub_money(authValue)
 		}
@@ -277,6 +283,8 @@ func UpdateMoneyHandler(c *gin.Context) {
 		"tuongtaccheo_ids", tuongtaccheoIDs,
 		"traodoisub_count", len(traodoisubIDs),
 		"traodoisub_ids", traodoisubIDs,
+		"vipig_count", len(vipigIDs),
+		"vipig_ids", vipigIDs,
 		"updated_count", len(updatedIDs),
 		"updated_ids", updatedIDs,
 		"updated_columns", updatedColumns,
