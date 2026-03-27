@@ -66,7 +66,7 @@ go run ./main
 Tu thu muc `backend/`:
 
 ```powershell
-python server/golang.py
+python server/go_run.py
 ```
 
 Che do nay se:
@@ -79,14 +79,14 @@ Neu may dev khong muon chay scheduler, set bien moi truong truoc khi start:
 
 ```powershell
 $env:GOLANG_SCHEDULER="0"
-python server/golang.py
+python server/go_run.py
 ```
 
 Neu can bat lai scheduler:
 
 ```powershell
 $env:GOLANG_SCHEDULER="1"
-python server/golang.py
+python server/go_run.py
 ```
 
 ### Chi chay Nginx

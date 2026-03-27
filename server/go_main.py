@@ -106,12 +106,6 @@ def start_golang(show_logs=False, wait=False, watch=False):
     return 0
 
 
-def restart_golang(show_logs=False, wait=False, watch=False):
-    stop_golang()
-    time.sleep(1)
-    return start_golang(show_logs=show_logs, wait=wait, watch=watch)
-
-
 def stop_golang():
     killed = set()
     killed.update(_stop_by_port(APP_PORT))
@@ -246,7 +240,8 @@ def _stop_golang_supervisors():
         ),
         (
             "Get-CimInstance Win32_Process | "
-            "Where-Object { $_.CommandLine -like '*backend\\\\server\\\\golang.py*' } | "
+            "Where-Object { $_.CommandLine -like '*backend\\\\server\\\\go_main.py*' -or "
+            "$_.CommandLine -like '*backend\\\\server\\\\go_run.py*' } | "
             "Select-Object -ExpandProperty ProcessId"
         ),
     ]
@@ -296,7 +291,8 @@ def _list_golang_supervisor_pids():
         ),
         (
             "Get-CimInstance Win32_Process | "
-            "Where-Object { $_.CommandLine -like '*backend\\\\server\\\\golang.py*' } | "
+            "Where-Object { $_.CommandLine -like '*backend\\\\server\\\\go_main.py*' -or "
+            "$_.CommandLine -like '*backend\\\\server\\\\go_run.py*' } | "
             "Select-Object -ExpandProperty ProcessId"
         ),
     ]
@@ -435,4 +431,4 @@ def _start_with_watch(cmd):
 
 
 if __name__ == "__main__":
-    raise SystemExit(restart_golang())
+    raise SystemExit(start_golang())

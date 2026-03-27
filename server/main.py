@@ -4,7 +4,7 @@ import sys
 import time
 from pathlib import Path
 
-from golang import start_golang, stop_golang
+from go_main import start_golang, stop_golang
 from nginx import start_nginx, stop_nginx
 
 
