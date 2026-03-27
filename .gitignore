@@ -7,3 +7,4 @@ golang/main/database/database_newest.sql
 *.session
 *.session-journal
 *.txt
+golang/service/openclaw/

@@ -102,6 +102,14 @@
           "interval_seconds": 2000,
           "status_cron": true,
           "cron_tyoe": "api_get"
+        },
+        {
+          "name_cron": "cập nhật sitemap",
+          "task_cron": "sitemap_update",
+          "url_cron": "https://nginx.nofake.wiki/go/check/xml_save_data",
+          "interval_seconds": 3800,
+          "status_cron": true,
+          "cron_tyoe": "api_get"
         }
       ]
     },

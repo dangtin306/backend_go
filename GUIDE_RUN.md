@@ -15,15 +15,27 @@ Ung dung doc cau hinh DB theo thu tu uu tien:
 2. File `golang/main/database/config_1.json`
 3. Gia tri mac dinh trong code
 
-Vi du PowerShell:
+Vi du PowerShell (chi cho session hien tai):
 
 ```powershell
-$env:DB_HOST="127.0.0.1"
+$env:DB_HOST="vip.tecom.pro"
 $env:DB_PORT="3306"
 $env:DB_USER="root"
 $env:DB_PASS="123456"
 $env:DB_NAME="hustmedi_777"
 ```
+
+Neu muon may chay on dinh theo kieu global (luu bien moi truong lau dai), dung `setx`:
+
+```powershell
+setx DB_HOST "vip.tecom.pro"
+setx DB_PORT "3306"
+setx DB_USER "root"
+setx DB_PASS "123456"
+setx DB_NAME "hustmedi_777"
+```
+
+Luu y: sau khi `setx`, can mo cua so terminal moi de bien co hieu luc.
 
 ## 3) Chay nhanh (khuyen nghi)
 
