@@ -61,7 +61,7 @@ cd golang
 go run ./main
 ```
 
-### Dev Go (khuyen nghi cho may dev) Chỉ dùng riêng GO
+### Dev Go (khuyen nghi cho may dev) Chỉ dùng riêng GO.
 
 Tu thu muc `backend/`:
 
