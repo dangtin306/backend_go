@@ -61,7 +61,7 @@ cd golang
 go run ./main
 ```
 
-### Dev Golang (khuyen nghi cho may dev)
+### Dev Go (khuyen nghi cho may dev)
 
 Tu thu muc `backend/`:
 
@@ -72,7 +72,7 @@ python server/go_run.py
 Che do nay se:
 
 - stop process cu
-- start lai golang backend
+- start lai Go backend
 - bat watch file `.go`/`.json` de tu restart khi code thay doi
 
 Neu may dev khong muon chay scheduler, set bien moi truong truoc khi start:
