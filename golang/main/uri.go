@@ -13,7 +13,6 @@ import (
 	otp_viotp "hust_backend/p2p/otp/viotp"
 	"hust_backend/p2p/scam_check"
 	"hust_backend/service"
-	openclawservice "hust_backend/service/openclaw"
 	"hust_backend/users/profile"
 
 	"github.com/gin-gonic/gin"
@@ -62,12 +61,6 @@ func registerRoutes(r *gin.Engine) {
 	r.Any("/database/export_data", database.ExportDataHandler)
 	r.Any("/service/money_update", service.UpdateMoneyHandler)
 	r.Any("/service/money_list", service.MoneyListHandler)
-	r.Any("/service/openclaw/approve_pairing", openclawservice.OpenClawApprovePairingHandler)
-	r.Any("/service/openclaw/desktop/status", openclawservice.OpenClawDesktopStatusHandler)
-	r.Any("/service/openclaw/desktop/list_windows", openclawservice.OpenClawDesktopListWindowsHandler)
-	r.Any("/service/openclaw/desktop/activate_window", openclawservice.OpenClawDesktopActivateWindowHandler)
-	r.Any("/service/openclaw/desktop/click", openclawservice.OpenClawDesktopClickHandler)
-	r.Any("/service/openclaw/desktop/send_keys", openclawservice.OpenClawDesktopSendKeysHandler)
-	r.Any("/service/openclaw/desktop/run_ahk", openclawservice.OpenClawDesktopRunAhkHandler)
+	registerOpenClawRoutes(r)
 	r.GET("/servers/scheduler/get_data", scheduler.GetDataHandler)
 }
