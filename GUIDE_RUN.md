@@ -61,6 +61,34 @@ cd golang
 go run ./main
 ```
 
+### Dev Golang (khuyen nghi cho may dev)
+
+Tu thu muc `backend/`:
+
+```powershell
+python server/main.py
+```
+
+Che do nay se:
+
+- stop process cu
+- start lai golang + nginx
+- bat watch file `.go`/`.json` de tu restart khi code thay doi
+
+Neu may dev khong muon chay scheduler, set bien moi truong truoc khi start:
+
+```powershell
+$env:GOLANG_SCHEDULER="0"
+python server/main.py
+```
+
+Neu can bat lai scheduler:
+
+```powershell
+$env:GOLANG_SCHEDULER="1"
+python server/main.py
+```
+
 ### Chi chay Nginx
 
 ```powershell
