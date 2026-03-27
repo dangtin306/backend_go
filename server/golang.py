@@ -106,6 +106,12 @@ def start_golang(show_logs=False, wait=False, watch=False):
     return 0
 
 
+def restart_golang(show_logs=False, wait=False, watch=False):
+    stop_golang()
+    time.sleep(1)
+    return start_golang(show_logs=show_logs, wait=wait, watch=watch)
+
+
 def stop_golang():
     killed = set()
     killed.update(_stop_by_port(APP_PORT))
@@ -429,4 +435,4 @@ def _start_with_watch(cmd):
 
 
 if __name__ == "__main__":
-    raise SystemExit(start_golang())
+    raise SystemExit(restart_golang())
