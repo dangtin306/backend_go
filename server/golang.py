@@ -24,7 +24,7 @@ def resolve_go_exe():
         return str(DEFAULT_GO)
     return "go"
 
-
+ 
 def is_process_running(pid):
     if pid <= 0:
         return False
